@@ -1,0 +1,39 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-image: url(../images/fundo.jpg);
+}
+
+h1 {
+    color: white;
+    font-size: 150px;
+    margin: 0 auto;
+    max-width: 50%
+}
+
+button {
+    position: absolute;
+    top: 50%;
+    left: 42%;
+    max-width: 200px;
+    text-align: center;
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 25px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.naoSelecionavel {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
