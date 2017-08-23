@@ -1,4 +1,5 @@
 var vida = 100;
+var y2;
 $(document).ready(function() {
     //colocando a nave na tela
     $('#nave').append($('<img/>').attr({
@@ -35,35 +36,27 @@ $(document).on("mousemove", function(evt) {
 $(document).bind('click', atira);
 
 //a função atira faz nascer uma bala na ponta da nave
-function atira(e) {
-    var coordenadas = [];
-
-    var styleProps = $('#nave').css(["top", "left"]);
-    $.each(styleProps, function(prop, value) {
-        coordenadas.push(value);
-    });
-
-    var x = coordenadas[1].replace('px', '');
-    var y = coordenadas[0].replace('px', '');
+function atira() {
+    var x = $('#nave')[0].getBoundingClientRect().left;
+    var y = $('#nave')[0].getBoundingClientRect().top;
 
     $('body').append($('<img/>').attr({
         src: 'images/bala.png',
         //esses valores adicionados(+15 e -25) funcionam apenas para a nave virada para cima
-        style: 'left: ' + (parseFloat(x) + 15) + 'px; top: ' + (parseFloat(y) - 25) + 'px; transform: rotate(' + (parseFloat(graus) + 270) + 'deg)',
+        style: 'left: ' + (parseFloat(x) + 15) + 'px; top: ' + (parseFloat(y) - 25) + 'px; transform: rotate(' + parseFloat(graus) + 'deg)',
         class: 'naoSelecionavel bala'
     }));
 
     function movimentaBala(height) {
-
+        $('.bala:eq(0)').attr('style', 'margin-top: ' + height + 'px; margin-left: ' + x + 'px)');
     }
 
-    var height2 = coordenadas[1].replace("px", "");
-    var height = parseFloat(height2);
     var intervalBala = setInterval(function() {
-        height -= 20;
-        movimentaBala(height);
-        if (height < 20) {
+        y2 -= 20;
+        movimentaBala(y2);
+        if (y2 < 20) {
             clearInterval(intervalBala)
+            $('.bala:eq(0)').remove();
         }
     }, 600);
 }
@@ -120,7 +113,6 @@ function verificaBatida() {
             var acm = 0;
             var intervalMorte = setInterval(function() {
                 acm++;
-                console.log(acm);
                 if (acm >= 40) {
                     $('img:eq(0)').remove();
                     clearInterval(intervalMorte);
