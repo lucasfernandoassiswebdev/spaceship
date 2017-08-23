@@ -6,19 +6,11 @@ body {
 
 #nave {
     position: absolute;
+    z-index: 9999;
 }
 
 .estrela {
     animation: orbita 4s linear infinite;
-}
-
-@keyframes orbita {
-    from {
-        transform: rotate(0deg) translateX(150px) rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg) translateX(150px) rotate(-360deg);
-    }
 }
 
 .naoSelecionavel {
@@ -33,4 +25,52 @@ body {
     position: absolute;
     width: 20px;
     height: 20px;
+    animation-name: moveBala;
+    animation-duration: 4s;
+}
+
+.gameboard {
+    position: absolute;
+    bottom: 0;
+    font-size: 40px;
+    color: white;
+    margin-left: 43%;
+}
+
+.vida {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background-color: green;
+}
+
+.efeitoPerca {
+    animation-name: efeitoPercaVida;
+    animation-duration: 1s;
+}
+
+@keyframes efeitoPercaVida {
+    from {
+        background-color: green;
+    }
+    to {
+        background-color: red;
+    }
+}
+
+@keyframes moveBala {
+    100% {
+        margin-top: 0px;
+    }
+}
+
+@keyframes orbita {
+    from {
+        transform: rotate(0deg) translateX(150px) rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg) translateX(150px) rotate(-360deg);
+    }
 }

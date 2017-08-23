@@ -1,3 +1,4 @@
+var vida = 100;
 $(document).ready(function() {
     //colocando a nave na tela
     $('#nave').append($('<img/>').attr({
@@ -53,7 +54,7 @@ function atira(e) {
     }));
 
     function movimentaBala(height) {
-        $('.bala').css('position: absolute; top : ' + height);
+
     }
 
     var height2 = coordenadas[1].replace("px", "");
@@ -100,38 +101,35 @@ setInterval(function() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function verificaBatida() {
-    var coordenadasNave = [];
-    var coordenadasAsteroide = [];
+    var nave = $("#nave");
+    var asteroides = $(".estrela");
 
-    var stylePropsA = $('#nave').css(["top", "left", "height", "width"]);
-    $.each(stylePropsA, function(prop, value) {
-        coordenadasNave.push(value);
-        alert(prop + ' ' + value);
-    });
-
-    var stylePropsB = $('.estrela').css(["top", "left", "height", "width"]);
-    $.each(stylePropsB, function(prop, value) {
-        coordenadasAsteroide.push(value);
-    });
-
-    if ((coordenadasNave[0] + coordenadasNave[2]) < coordenadasAsteroide[0] ||
-        coordenadasNave[0] > (coordenadasAsteroide[0] + coordenadasAsteroide[[2]]) ||
-        (coordenadasNave[1] + coordenadasNave[3]) < coordenadasAsteroide[1] ||
-        coordenadasNave[1] > (coordenadasNave[1] + coordenadasAsteroide[3])) {
-        $('#pontos').html('bateu marreco');
+    var rangeIntersect = function(min0, max0, min1, max1) {
+            return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
+        }
+        //Função para detectar se 2 BoundingClientRect's estão colidindo
+    var rectIntersect = function(r0, r1) {
+        return rangeIntersect(r0.left, r0.right, r1.left, r1.right) && rangeIntersect(r0.top, r0.bottom, r1.top, r1.bottom)
     }
+
+    var BBoxA = nave[0].getBoundingClientRect();
+    asteroides.each(function() {
+        var BBoxB = this.getBoundingClientRect();
+        if (rectIntersect(BBoxA, BBoxB)) {
+            $('img:eq(0)').attr('src', 'images/explosao.gif-c200');
+            var acm = 0;
+            var intervalMorte = setInterval(function() {
+                acm++;
+                console.log(acm);
+                if (acm >= 40) {
+                    $('img:eq(0)').remove();
+                    clearInterval(intervalMorte);
+                    window.location.href = "derrota.html";
+                }
+            }, 20);
+            $('#pontos').html('Destruído');
+        }
+    });
 }
 
-intervalColisao = setInterval(function() {
-    verificaBatida();
-}, 200);
-
-
-function isCollide(a, b) {
-    return !(
-        ((a.y + a.height) < (b.y)) ||
-        (a.y > (b.y + b.height)) ||
-        ((a.x + a.width) < b.x) ||
-        (a.x > (b.x + b.width))
-    );
-}
+intervalColisao = setInterval(verificaBatida, 200);
