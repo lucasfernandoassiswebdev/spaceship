@@ -32,7 +32,7 @@ body {
 
 .gameboard {
     position: absolute;
-    bottom: 0;
+    bottom: 20px;
     font-size: 40px;
     color: white;
     margin-left: 43%;
@@ -50,6 +50,17 @@ body {
 .efeitoPerca {
     animation-name: efeitoPercaVida;
     animation-duration: 1s;
+}
+
+button {
+    position: absolute;
+    top: 50%;
+    left: 44%;
+    max-width: 200px;
+    text-align: center;
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 25px;
 }
 
 @keyframes efeitoPercaVida {

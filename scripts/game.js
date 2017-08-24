@@ -17,6 +17,8 @@ $(document).ready(function() {
         src: 'images/nave2.png',
         style: 'width:50px;height:50px'
     }));
+
+    $('#looseLabelA, #looseButton').hide();
 });
 
 var intervalAsteroides = setInterval(geraAsteroide, tempo);
@@ -52,7 +54,6 @@ function atira() {
     //encontrando as coordenadas da nave
     x = $('#nave')[0].getBoundingClientRect().left;
     y = $('#nave')[0].getBoundingClientRect().top;
-
     $('body').append($('<img/>').attr({
         src: 'images/bala.png',
         style: 'left: ' + (x + 15) + 'px; top: ' + (y - 30) + 'px; transform: rotate(' + graus + 'deg);',
@@ -62,8 +63,17 @@ function atira() {
 
 setInterval(function() {
     $('.bala').each(function() {
+        var wTela = $('body').width();
+        var hTela = $(window).height();
+        var tTiro = $(this).position().top;
+        var lTiro = $(this).position().left;
+
         var top = this.getBoundingClientRect().top - 2;
-        $(this).css('top', top + 'px');
+        $(this).css({
+            top: top + 'px',
+            //transform: 'rotate(' + graus + 'deg) translate(' + (parseFloat(wTela) - lTiro) + 'px, ' + (parseFloat(hTela) - tTiro) + 'px)'
+            transform: 'rotate(' + graus + 'deg)'
+        });
         if (top < -80)
             $(this).remove();
     });
@@ -130,8 +140,10 @@ function verificaBatida() {
                     //removemos a nave quando o gif termina de executar e redirecionamos para a tela de derrota
                     $('img:eq(0)').remove();
                     $('.estrela').remove();
+                    $('#looseLabelA').show();
+                    $('#looseButton').show();
+                    $('document').css('cursor', 'pointer')
                     clearInterval(intervalMorte);
-                    window.location.href = "derrota.html";
                 }
             }, 20);
             $('#pontos').html('Destruído');
