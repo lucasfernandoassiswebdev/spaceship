@@ -14,9 +14,8 @@ var graus = 0,
 $(document).ready(function() {
     //colocando a nave na tela
     $('#nave').append($('<img/>').attr({
-        src: 'images/nave.png',
-        style: 'width:50px;height:50px',
-        class: 'naoSelecionavel'
+        src: 'images/nave2.png',
+        style: 'width:50px;height:50px'
     }));
 });
 
@@ -32,10 +31,10 @@ function geraAsteroide() {
     //é adicionado o asteróide na tela na posição sorteada
     $('body').append($('<img/>').attr({
         src: 'images/asteroide.png',
-        style: 'width: ' + size + 'px; height: ' + size + 'px; left: ' + marginl + 'px; top: ' + margint + 'px; position: absolute',
-        class: 'naoSelecionavel estrela'
+        style: 'width: ' + size + 'px; height: ' + size + 'px; left: ' + marginl + 'px; top: ' + margint + 'px;',
+        class: 'estrela'
     }));
-    pedras++;
+    pedras = $('.estrela').length;
     //definindo um número máximo de asteróides
     if (pedras == 10) {
         clearInterval(intervalAsteroides);
@@ -56,29 +55,19 @@ function atira() {
 
     $('body').append($('<img/>').attr({
         src: 'images/bala.png',
-        style: 'left: ' + (parseFloat(x) + 15) + 'px; top: ' + (parseFloat(y) - 30) + 'px; transform: rotate(' + parseFloat(graus) + 'deg ); margin-bottom: 500px',
-        class: 'naoSelecionavel bala'
+        style: 'left: ' + (x + 15) + 'px; top: ' + (y - 30) + 'px; transform: rotate(' + graus + 'deg);',
+        class: 'bala'
     }));
-
-    //logo após adicionar as balas, as balas são movimentadas
-    function movimentaBala(width, height, i) {
-        $('.bala:eq(' + i + ')').attr('style', 'top: ' + parseFloat(height) + 'px; left: ' + (parseFloat(width) + 8) + 'px;');
-    }
-
-    var ctrl = y;
-    var width = x;
-    var intervalBala = setInterval(function() {
-        if (ctrl > -80) {
-            ctrl--;
-            for (var i = 0; i < $('.bala').length; i++) {
-                movimentaBala(width, ctrl, i);
-            }
-        } else {
-            $('.bala:eq(0)').remove();
-            clearInterval(intervalBala);
-        }
-    }, 1);
 }
+
+setInterval(function() {
+    $('.bala').each(function() {
+        var top = this.getBoundingClientRect().top - 2;
+        $(this).css('top', top + 'px');
+        if (top < -80)
+            $(this).remove();
+    });
+}, );
 
 window.onkeydown = function(e) {
     //pegando a tecla pressionada e rodando a nave
@@ -99,7 +88,6 @@ window.onkeyup = function(e) {
     if (key == 65)
         left = undefined;
 }
-
 
 setInterval(function() {
     //interval que rotaciona a nave
@@ -152,10 +140,6 @@ function verificaBatida() {
 }
 
 function verificaBatidaTiro() {
-
-    var bala = $(".bala");
-    var asteroides = $(".estrela");
-
     var rangeIntersect = function(min0, max0, min1, max1) {
         return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
     }
@@ -164,27 +148,24 @@ function verificaBatidaTiro() {
         return rangeIntersect(r0.left, r0.right, r1.left, r1.right) && rangeIntersect(r0.top, r0.bottom, r1.top, r1.bottom)
     }
 
-    for (i = 0; i <= bala.length; i++) {
-        var BBoxA = bala[i].getBoundingClientRect();
-        for (i = 0; i <= asteroides.length; i++) {
-            var BBoxB = asteroides[i].getBoundingClientRect();
-            asteroides.each(function() {
-                if (rectIntersect(BBoxA, BBoxB)) {
-                    pontos++;
-                    $('.estrela:eq(' + i + ')').attr('src', 'images/explosao.gif-c200');
-                    var acm = 0;
-                    var intervalMorteAsteroide = setInterval(function() {
-                        acm++;
-                        if (acm >= 40) {
-                            $('estrela:eq(' + i + ')').remove();
-                            clearInterval(intervalMorteAsteroide);
-                        }
-                    }, 10);
+    $(".bala").each(function() {
+        var BBoxA = this.getBoundingClientRect();
+        $(".estrela").each(function() {
+            var BBoxB = this.getBoundingClientRect();
+            if (rectIntersect(BBoxA, BBoxB)) {
+                pontos++;
+                if (pontos <= 1000) {
+                    $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
+                    setTimeout(function() {
+                        $('.explodiu').remove();
+                    }, 400);
                     $('#pontos').html('Pontuação: ' + pontos);
+                } else {
+                    //aqui vai surgir o boss 
                 }
-            });
-        }
-    }
+            }
+        });
+    });
 }
 
 intervalColisao = setInterval(verificaBatida, 200);
