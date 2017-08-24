@@ -1,5 +1,16 @@
-var vida = 100;
-var y2;
+//variáveis de controle do jogo
+var vida = 100,
+    x2 = 0,
+    y2 = 0,
+    pontos = 0,
+    tempo = 3000,
+    pedras = 0;
+
+//variáveis para lidar com a rotação da nave
+var graus = 0,
+    right, left, speed = 3;
+
+
 $(document).ready(function() {
     //colocando a nave na tela
     $('#nave').append($('<img/>').attr({
@@ -7,100 +18,112 @@ $(document).ready(function() {
         style: 'width:50px;height:50px',
         class: 'naoSelecionavel'
     }));
-
-    //colocando 6 asteróides de tamanhos e lugares aleatórios
-    var pedras = 0;
-    var interval = setInterval(function() {
-        var size = Math.floor(Math.random() * 100) + 10;
-        var marginl = Math.floor(Math.random() * $(window).width()) + 80;
-        var margint = Math.floor(Math.random() * $(window).height()) + 1;
-
-        $('body').append($('<img/>').attr({
-            src: 'images/asteroide.png',
-            style: 'width: ' + size + 'px; height: ' + size + 'px; left: ' + marginl + 'px; top: ' + margint + 'px; position: absolute',
-            class: 'naoSelecionavel estrela'
-        }));
-        pedras++;
-        if (pedras == 6) {
-            clearInterval(interval);
-        }
-    }, 1500)
 });
 
-//fazendo a nave acompanhar o mouse
+var intervalAsteroides = setInterval(geraAsteroide, tempo);
+
+function geraAsteroide() {
+    //esses números serão sorteados para fazer com que os asteróides nasçam em lugares aleatórios e dentro da tela
+    //t = top / l == left
+    var size = Math.floor(Math.random() * 100) + 10;
+    var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
+    var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
+
+    //é adicionado o asteróide na tela na posição sorteada
+    $('body').append($('<img/>').attr({
+        src: 'images/asteroide.png',
+        style: 'width: ' + size + 'px; height: ' + size + 'px; left: ' + marginl + 'px; top: ' + margint + 'px; position: absolute',
+        class: 'naoSelecionavel estrela'
+    }));
+    pedras++;
+    //definindo um número máximo de asteróides
+    if (pedras == 10) {
+        clearInterval(intervalAsteroides);
+    }
+}
+
 $(document).on("mousemove", function(evt) {
+    //fazendo a nave acompanhar o mouse
     $('#nave').css({ left: evt.pageX - 25, top: evt.pageY - 30 });
 });
 
-//fazendo a nave atirar quando o mouse clicar
 $(document).bind('click', atira);
 
-//a função atira faz nascer uma bala na ponta da nave
 function atira() {
-    var x = $('#nave')[0].getBoundingClientRect().left;
-    var y = $('#nave')[0].getBoundingClientRect().top;
+    //encontrando as coordenadas da nave
+    x = $('#nave')[0].getBoundingClientRect().left;
+    y = $('#nave')[0].getBoundingClientRect().top;
 
     $('body').append($('<img/>').attr({
         src: 'images/bala.png',
-        //esses valores adicionados(+15 e -25) funcionam apenas para a nave virada para cima
-        style: 'left: ' + (parseFloat(x) + 15) + 'px; top: ' + (parseFloat(y) - 25) + 'px; transform: rotate(' + parseFloat(graus) + 'deg)',
+        style: 'left: ' + (parseFloat(x) + 15) + 'px; top: ' + (parseFloat(y) - 30) + 'px; transform: rotate(' + parseFloat(graus) + 'deg ); margin-bottom: 500px',
         class: 'naoSelecionavel bala'
     }));
 
-    function movimentaBala(height) {
-        $('.bala:eq(0)').attr('style', 'margin-top: ' + height + 'px; margin-left: ' + x + 'px)');
+    //logo após adicionar as balas, as balas são movimentadas
+    function movimentaBala(width, height, i) {
+        $('.bala:eq(' + i + ')').attr('style', 'top: ' + parseFloat(height) + 'px; left: ' + (parseFloat(width) + 8) + 'px;');
     }
 
+    var ctrl = y;
+    var width = x;
     var intervalBala = setInterval(function() {
-        y2 -= 20;
-        movimentaBala(y2);
-        if (y2 < 20) {
-            clearInterval(intervalBala)
+        if (ctrl > -80) {
+            ctrl--;
+            for (var i = 0; i < $('.bala').length; i++) {
+                movimentaBala(width, ctrl, i);
+            }
+        } else {
             $('.bala:eq(0)').remove();
+            clearInterval(intervalBala);
         }
-    }, 600);
+    }, 1);
 }
 
-//pegando a tecla pressionada e rodando a nave
-var graus = 0,
-    right, left, speed = 3;
 window.onkeydown = function(e) {
+    //pegando a tecla pressionada e rodando a nave
     var key = e.keyCode ? e.keyCode : e.which;
-    if (key == 68) //se a tecla d é pressionada a variável right vira true
+    //se a tecla "D" é pressionada a variável right vira true
+    if (key == 68)
         right = true;
-    if (key == 65) //o mesmo vale para a tecla a e a variável left
+    //o mesmo vale para a tecla a e a variável left
+    if (key == 65)
         left = true;
 }
+
 window.onkeyup = function(e) {
     var key = e.keyCode ? e.keyCode : e.which;
-    if (key == 68) //quando essas teclas são soltas elas voltam a ser undefined
+    //quando essas teclas são soltas, as variáveis left e right elas voltam a ser undefined
+    if (key == 68)
         right = undefined;
     if (key == 65)
         left = undefined;
 }
 
-//interval que rotaciona a nave
-setInterval(function() {
-    if (!left && !right) //se as teclas a ou d não estão sendo pressionadas, o interpretador sai da funçã setInterval
-        return;
 
-    if (left) //se as teclas esquerda ou direita estão sendo pressionadas, mudamos a curvatura da nave
+setInterval(function() {
+    //interval que rotaciona a nave
+    //se as teclas "A" ou "D" não estão sendo pressionadas, o interpretador não executa a função até o finel
+    if (!left && !right)
+        return;
+    //se as teclas esquerda ou direita estão sendo pressionadas, mudamos a curvatura da nave
+    if (left)
         graus -= speed;
     if (right)
         graus += speed;
-
-    $('#nave').css('transform', 'rotate(' + graus + 'deg)'); //depois de mudar a curvatura mandamos escrever ela
+    //depois de mudar os graus de  curvatura, rotacionamos a nave
+    $('#nave').css('transform', 'rotate(' + graus + 'deg)');
 }, 10);
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function verificaBatida() {
+    //verifica se a nave colidou com algum asteróide
     var nave = $("#nave");
     var asteroides = $(".estrela");
 
     var rangeIntersect = function(min0, max0, min1, max1) {
-            return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
-        }
-        //Função para detectar se 2 BoundingClientRect's estão colidindo
+        return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
+    }
+
     var rectIntersect = function(r0, r1) {
         return rangeIntersect(r0.left, r0.right, r1.left, r1.right) && rangeIntersect(r0.top, r0.bottom, r1.top, r1.bottom)
     }
@@ -109,12 +132,16 @@ function verificaBatida() {
     asteroides.each(function() {
         var BBoxB = this.getBoundingClientRect();
         if (rectIntersect(BBoxA, BBoxB)) {
+            //a primeira imagem sempre será a nave
             $('img:eq(0)').attr('src', 'images/explosao.gif-c200');
+            $('.estrela').attr('src', 'images/explosao.gif-c200');
             var acm = 0;
             var intervalMorte = setInterval(function() {
                 acm++;
                 if (acm >= 40) {
+                    //removemos a nave quando o gif termina de executar e redirecionamos para a tela de derrota
                     $('img:eq(0)').remove();
+                    $('.estrela').remove();
                     clearInterval(intervalMorte);
                     window.location.href = "derrota.html";
                 }
@@ -124,4 +151,42 @@ function verificaBatida() {
     });
 }
 
+function verificaBatidaTiro() {
+
+    var bala = $(".bala");
+    var asteroides = $(".estrela");
+
+    var rangeIntersect = function(min0, max0, min1, max1) {
+        return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
+    }
+
+    var rectIntersect = function(r0, r1) {
+        return rangeIntersect(r0.left, r0.right, r1.left, r1.right) && rangeIntersect(r0.top, r0.bottom, r1.top, r1.bottom)
+    }
+
+    for (i = 0; i <= bala.length; i++) {
+        var BBoxA = bala[0].getBoundingClientRect();
+        for (i = 1; i <= asteroides.length; i++) {
+            var BBoxB = asteroides[0].getBoundingClientRect();
+            asteroides.each(function() {
+                if (rectIntersect(BBoxA, BBoxB)) {
+                    pontos++;
+                    $('.estrela:eq(' + i + ')').attr('src', 'images/explosao.gif-c200');
+                    var acm = 0;
+                    var intervalMorteAsteroide = setInterval(function() {
+                        acm++;
+                        if (acm >= 40) {
+                            $('img:eq(' + i + ')').remove();
+                            clearInterval(intervalMorteAsteroide);
+                            window.location.href = "derrota.html";
+                        }
+                    }, 200);
+                    $('#pontos').html('Pontuação: ' + pontos);
+                }
+            });
+        }
+    }
+}
+
 intervalColisao = setInterval(verificaBatida, 200);
+intervalColisaoTiros = setInterval(verificaBatidaTiro, 200);
