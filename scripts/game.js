@@ -165,9 +165,9 @@ function verificaBatidaTiro() {
     }
 
     for (i = 0; i <= bala.length; i++) {
-        var BBoxA = bala[0].getBoundingClientRect();
-        for (i = 1; i <= asteroides.length; i++) {
-            var BBoxB = asteroides[0].getBoundingClientRect();
+        var BBoxA = bala[i].getBoundingClientRect();
+        for (i = 0; i <= asteroides.length; i++) {
+            var BBoxB = asteroides[i].getBoundingClientRect();
             asteroides.each(function() {
                 if (rectIntersect(BBoxA, BBoxB)) {
                     pontos++;
@@ -176,11 +176,10 @@ function verificaBatidaTiro() {
                     var intervalMorteAsteroide = setInterval(function() {
                         acm++;
                         if (acm >= 40) {
-                            $('img:eq(' + i + ')').remove();
+                            $('estrela:eq(' + i + ')').remove();
                             clearInterval(intervalMorteAsteroide);
-                            window.location.href = "derrota.html";
                         }
-                    }, 200);
+                    }, 10);
                     $('#pontos').html('Pontuação: ' + pontos);
                 }
             });
