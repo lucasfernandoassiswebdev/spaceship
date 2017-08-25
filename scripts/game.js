@@ -3,12 +3,13 @@ var vida = 100,
     x2 = 0,
     y2 = 0,
     pontos = 0,
-    tempo = 3000,
+    tempo = 1500,
     pedras = 0;
 
 //variáveis para lidar com a rotação da nave
 var graus = 0,
-    right, left, speed = 3;
+    right, left, speed = 3,
+    xBoss, yBoss, tempoTiroBoss = 500;
 
 $(document).ready(function() {
     //colocando a nave na tela
@@ -23,7 +24,7 @@ $(document).ready(function() {
         intervalAsteroides = setInterval(geraAsteroide, tempo);
         intervalTiros = setInterval(movimentaTiro, 15);
         //tela de derrota é escondida novamente
-        $('#looseButton, #looseButton, #looseLabelA').hide();
+        $('#looseButton, #looseLabelA').hide();
         //concertando o gameboard
         $('#pontos').html('Pontuação: 0');
         //é recolocada a nave na tela
@@ -101,7 +102,6 @@ function movimentaTiro() {
         var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
         if (eixoy < -800) {
             $(this).remove();
-            eixoy = 0;
         } else {
             $(this).css({
                 transform: 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + 0 + 'px, ' + eixoy + 'px)'
@@ -203,7 +203,7 @@ function verificaBatidaTiro() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 pontos++;
-                if (pontos <= 10) {
+                if (pontos < 0) {
                     $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
                     setTimeout(function() {
                         $('.explodiu').remove();
@@ -215,10 +215,7 @@ function verificaBatidaTiro() {
                     $('.estrela, .bala').remove();
                     $('.vida').show();
                     //limpando intervals necessários
-                    clearInterval(intervalColisaoTiros);
                     clearInterval(intervalAsteroides);
-                    clearInterval(intervalColisao);
-                    clearInterval(intervalMorte);
                     //avisando que o boss surgiu
                     $('#pontos').html('Boss');
                     nascerBoss();
@@ -231,10 +228,106 @@ function verificaBatidaTiro() {
 intervalColisao = setInterval(verificaBatida, 20);
 intervalColisaoTiros = setInterval(verificaBatidaTiro, 10);
 
-//códigos do boss
+/////////////////////////////////////////////////códigos do boss/////////////////////////////////////////////////////////
+//fazendo as balas nascerem e andarem
 function nascerBoss() {
     $('#boss').append($('<img/>').attr({
-        src: 'images/boss.png',
-        style: 'width:50px;height:50px;'
+        src: 'images/inimigo.png',
+        style: 'width:150px;height:150px;transform:rotate(90deg)',
+        class: 'boss'
     }));
+    //fazendo as balas surgirem e movimentando elas logo após
+    intervalTirosBoss = setInterval(bossShoot, tempoTiroBoss);
+    intervalBalasBoss = setInterval(movimentaTiroBoss, 20);
+    //verificando se a nave bateu com o Boss
+    intervalBatida = setInterval(batidaBoss, 20);
+    //verificando se algum tiro acertou
+    intervalNaveBoss = setInterval(verificaTiroNaveBoss,20)
+    intervalBossNave = setInterval(verificaTiroBossNave,20);
+}
+
+function bossShoot() {
+    //pegando a posição atual do boss
+    yBoss = $('.boss').position().top;
+    //colocando a bala na frente dele
+    $('body').append($('<img/>').attr({
+        src: 'images/balaBoss.png',
+        style: 'position:absolute; left: 160px; top: ' + (yBoss + 62.5) + 'px; width: 20px; height: 20px',
+        class: 'bossShoot',
+    }).attr("data-left", 160));
+}
+
+function movimentaTiroBoss() {
+    $('.bossShoot').each(function() {
+        var pixels = (+$(this).attr("data-left")) + 20;
+        if (pixels > $(window).width()) {
+            $(this).remove();
+        } else {
+            $(this).css('left', pixels).attr('data-left', pixels);
+        }
+    });
+}
+
+//verificando as colisões entre os tiros 
+function batidaBoss() {
+    //verifica se a nave colidou com algum asteróide
+    var nave = $("#nave");
+    var asteroides = $(".boss");
+
+    var rangeIntersect = function(min0, max0, min1, max1) {
+        return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
+    }
+
+    var rectIntersect = function(r0, r1) {
+        return rangeIntersect(r0.left, r0.right, r1.left, r1.right) && rangeIntersect(r0.top, r0.bottom, r1.top, r1.bottom)
+    }
+
+    var BBoxA = nave[0].getBoundingClientRect();
+    asteroides.each(function() {
+        var BBoxB = this.getBoundingClientRect();
+        if (rectIntersect(BBoxA, BBoxB)) {
+            $('img:eq(0), .estrela').attr('src', 'images/explosao.gif-c200');
+            $('.boss').attr('src', 'images/explosao.gif-c200');
+            var acm = 0;
+            var intervalMorte = setInterval(function() {
+                acm++;
+                if (acm >= 10) {
+                    graus = 0;
+                    snowStorm.randomizeWind;
+                    $('img:eq(0), .estrela, .bala').remove();
+                    clearInterval(intervalAsteroides);
+                    clearInterval(intervalColisaoTiros);
+                    clearInterval(intervalMorte);
+                    clearInterval(intervalTiros);
+                    $('#looseLabelA, #looseButton').show();
+                    $("*").css("cursor", "default");
+                }
+            }, 40);
+            $('#pontos').html('Destruído');
+        }
+    });
+}
+
+function verificaTiroNaveBoss() {
+    var rangeIntersect = function(min0, max0, min1, max1) {
+        return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
+    }
+
+    var rectIntersect = function(r0, r1) {
+        return rangeIntersect(r0.left, r0.right, r1.left, r1.right) && rangeIntersect(r0.top, r0.bottom, r1.top, r1.bottom)
+    }
+
+    $(".bala").each(function() {
+        var BBoxA = this.getBoundingClientRect();
+        $(".boss").each(function() {
+            var BBoxB = this.getBoundingClientRect();
+            if (rectIntersect(BBoxA, BBoxB)) {
+                $('#pontos').html('You win');
+                $('.boss').attr('src', 'images/explosao.gif-c200').addClass("explodiu");
+                setTimeout(function() {
+                    $('.explodiu, .bala, .bossShoot, #nave').remove();
+                }, 400);
+            }
+        });
+    });
 }

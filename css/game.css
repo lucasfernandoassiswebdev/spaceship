@@ -63,6 +63,13 @@ button {
     border-radius: 25px;
 }
 
+.boss {
+    animation: MoveUpDown 3s linear infinite;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
 @keyframes efeitoPercaVida {
     from {
         background-color: green;
@@ -78,5 +85,17 @@ button {
     }
     to {
         transform: rotate(360deg) translateX(150px) rotate(-360deg);
+    }
+}
+
+@keyframes MoveUpDown {
+    0% {
+        bottom: 0;
+    }
+    50% {
+        bottom: 700px;
+    }
+    100% {
+        bottom: 0;
     }
 }
