@@ -8,7 +8,8 @@ var vida = 100,
 
 //variáveis para lidar com a rotação da nave
 var graus = 0,
-    right, left, speed = 3;
+    right, left, speed = 3,
+    eixoy = 0;;
 
 
 $(document).ready(function() {
@@ -38,7 +39,7 @@ $(document).ready(function() {
 function geraNave() {
     $('#nave').append($('<img/>').attr({
         src: 'images/nave2.png',
-        style: 'width:50px;height:50px'
+        style: 'width:50px;height:50px;'
     }));
 }
 var intervalAsteroides = setInterval(geraAsteroide, tempo);
@@ -81,37 +82,35 @@ function atira() {
     }));
 }
 
-
 intervalTiros = setInterval(movimentaTiro, 20);
+
+/* esse trecho vai ser o míssil teleguiado
+function movimentaTiro() {
+    $('.bala').each(function() {
+        eixoy -= 20;
+        if (eixoy < -800) {
+            $(this).remove();
+            eixoy = 0;
+        } else {
+            $(this).css({
+                transform: 'rotate(' + graus + 'deg) translate(' + 0 + 'px, ' + eixoy + 'px)'
+            });
+        }
+    });
+}
+*/
 
 function movimentaTiro() {
     $('.bala').each(function() {
-        var wTela = $(window).width();
-        var hTela = $(window).height();
-        var tTiro = $(this).position().top;
-        var lTiro = $(this).position().left;
-        //caso a nave esteja reta irei utilizar esta variável
-        var top;
-        //caso não, vou usar essa
-        if (graus == 0) {
-            top = this.getBoundingClientRect().top - 15;
-            $(this).css({
-                top: top + 'px',
-                transform: 'rotate(' + graus + 'deg)'
-            });
-            if (top < -80)
-                $(this).remove();
-        } else if (graus == 180) {
-            top = this.getBoundingClientRect().top + 15;
-            $(this).css({
-                top: top + 'px',
-                transform: 'rotate(' + graus + 'deg)'
-            });
-            if (top > $(window).height())
-                $(this).remove();
+        var grauAtual = graus;
+        eixoy -= 20;
+        console.log(eixoy);
+        if (eixoy < -800) {
+            $(this).remove();
+            eixoy = 0;
         } else {
             $(this).css({
-                transform: 'rotate(' + graus + 'deg) translate(' + (parseFloat(wTela) - lTiro) + 'px, ' + (parseFloat(hTela) - tTiro) + 'px)'
+                transform: 'rotate(' + grauAtual + 'deg) translate(' + 0 + 'px, ' + eixoy + 'px)'
             });
         }
     });
@@ -175,6 +174,7 @@ function verificaBatida() {
             var intervalMorte = setInterval(function() {
                 acm++;
                 if (acm >= 40) {
+                    graus = 0;
                     //movimentando as estrelas para fingir um abalo
                     snowStorm.randomizeWind;
                     //esse código apaga a nave, balas e asteróides que estão na tela
