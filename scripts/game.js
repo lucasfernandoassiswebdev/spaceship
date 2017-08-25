@@ -14,10 +14,12 @@ var graus = 0,
 $(document).ready(function() {
     //colocando a nave na tela
     geraNave();
-
+    //escondendo os elementos desnecessários durante o jogo normal
     $('#looseLabelA, #looseButton, .vida').hide();
-
+    //restartando o jogo
     $('#looseButton').on('click', function() {
+        //zerando os pontos
+        pontos = 0;
         //é inicio novamente os intervals que haviam sido finalizados
         intervalColisao = setInterval(verificaBatida, 200);
         intervalColisaoTiros = setInterval(verificaBatidaTiro, 200);
@@ -27,7 +29,7 @@ $(document).ready(function() {
         $('#looseButton, #looseLabelA').hide();
         //concertando o gameboard
         $('#pontos').html('Pontuação: 0');
-        //é recolocada a nave na tela
+        //é colocada a nave na tela novemente
         geraNave();
     });
 
@@ -44,10 +46,16 @@ var intervalAsteroides = setInterval(geraAsteroide, tempo);
 function geraAsteroide() {
     //esses números serão sorteados para fazer com que os asteróides nasçam em lugares aleatórios e dentro da tela
     //t = top / l == left
-    var size = Math.floor(Math.random() * 100) + 10;
+    var tNave = $('#nave').position().top;
+    var lNave = $('#nave').position().left;
+    var size = Math.floor(Math.random() * 100) + 50;
     var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
     var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
-
+    //o asteróide não pode nascer dentro da nave nem muito próximo
+    while (marginl >= (lNave - 200) && marginl <= (lNave + 100) && margint >= (tNave - 200) && margint <= (tNave + 200)) {
+        var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
+        var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
+    }
     //é adicionado o asteróide na tela na posição sorteada
     $('body').append($('<img/>').attr({
         src: 'images/asteroide.png',
@@ -203,7 +211,7 @@ function verificaBatidaTiro() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 pontos++;
-                if (pontos < 0) {
+                if (pontos <= 70) {
                     $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
                     setTimeout(function() {
                         $('.explodiu').remove();
@@ -242,8 +250,20 @@ function nascerBoss() {
     //verificando se a nave bateu com o Boss
     intervalBatida = setInterval(batidaBoss, 20);
     //verificando se algum tiro acertou
-    intervalNaveBoss = setInterval(verificaTiroNaveBoss,20)
-    intervalBossNave = setInterval(verificaTiroBossNave,20);
+    intervalNaveBoss = setInterval(verificaTiroNaveBoss, 20)
+    intervalBossNave = setInterval(verificaTiroBossNave, 20);
+    //setando a vida do boss 
+    vida = 1000;
+    //aumentando a dificuldade do boss
+    //a cada 20 segundos enfrentando o boss ele fica mais difícil
+    intervalAumentaDificuldade = setInterval(function() {
+        if (tempoTiroBoss >= 101) {
+            clearInterval(intervalTirosBoss);
+            tempoTiroBoss -= 25;
+            console.log(tempoTiroBoss);
+            intervalTirosBoss = setInterval(bossShoot, tempoTiroBoss);
+        }
+    }, 2000);
 }
 
 function bossShoot() {
@@ -299,6 +319,7 @@ function batidaBoss() {
                     clearInterval(intervalColisaoTiros);
                     clearInterval(intervalMorte);
                     clearInterval(intervalTiros);
+                    clearInterval(intervalAumentaDificuldade);
                     $('#looseLabelA, #looseButton').show();
                     $("*").css("cursor", "default");
                 }
@@ -322,11 +343,17 @@ function verificaTiroNaveBoss() {
         $(".boss").each(function() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
-                $('#pontos').html('You win');
-                $('.boss').attr('src', 'images/explosao.gif-c200').addClass("explodiu");
-                setTimeout(function() {
-                    $('.explodiu, .bala, .bossShoot, #nave').remove();
-                }, 400);
+                vida--;
+                $('.boss').addClass('efeitoPerca');
+                if (vida <= 0) {
+                    $('#pontos').html('You win');
+                    $('.boss').attr('src', 'images/explosao.gif-c200').addClass("explodiu");
+                    setTimeout(function() {
+                        $('.explodiu, .bala, .bossShoot, #nave').remove();
+                        $('#looseButton').show();
+                        $('*').css('cursor', 'default');
+                    }, 400);
+                }
             }
         });
     });
