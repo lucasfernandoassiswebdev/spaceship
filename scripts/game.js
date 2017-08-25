@@ -8,9 +8,7 @@ var vida = 100,
 
 //variáveis para lidar com a rotação da nave
 var graus = 0,
-    right, left, speed = 3,
-    eixoy = 0;;
-
+    right, left, speed = 3;
 
 $(document).ready(function() {
     //colocando a nave na tela
@@ -79,7 +77,7 @@ function atira() {
         src: 'images/bala.png',
         style: 'left: ' + (x + 15) + 'px; top: ' + (y - 30) + 'px; transform: rotate(' + graus + 'deg);',
         class: 'bala'
-    }));
+    }).attr("data-grau", graus));
 }
 
 intervalTiros = setInterval(movimentaTiro, 20);
@@ -102,16 +100,14 @@ function movimentaTiro() {
 
 function movimentaTiro() {
     $('.bala').each(function() {
-        var grauAtual = graus;
-        eixoy -= 20;
-        console.log(eixoy);
+        var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
         if (eixoy < -800) {
             $(this).remove();
             eixoy = 0;
         } else {
             $(this).css({
-                transform: 'rotate(' + grauAtual + 'deg) translate(' + 0 + 'px, ' + eixoy + 'px)'
-            });
+                transform: 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + 0 + 'px, ' + eixoy + 'px)'
+            }).attr("data-eixo", eixoy);
         }
     });
 }
