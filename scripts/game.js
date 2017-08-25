@@ -14,7 +14,7 @@ $(document).ready(function() {
     //colocando a nave na tela
     geraNave();
 
-    $('#looseLabelA, #looseButton').hide();
+    $('#looseLabelA, #looseButton, .vida').hide();
 
     $('#looseButton').on('click', function() {
         //é inicio novamente os intervals que haviam sido finalizados
@@ -23,9 +23,7 @@ $(document).ready(function() {
         intervalAsteroides = setInterval(geraAsteroide, tempo);
         intervalTiros = setInterval(movimentaTiro, 15);
         //tela de derrota é escondida novamente
-        $('#looseButton').hide();
-        $('#looseButton').hide();
-        $('#looseLabelA').hide();
+        $('#looseButton, #looseButton, #looseLabelA').hide();
         //concertando o gameboard
         $('#pontos').html('Pontuação: 0');
         //é recolocada a nave na tela
@@ -164,8 +162,7 @@ function verificaBatida() {
         var BBoxB = this.getBoundingClientRect();
         if (rectIntersect(BBoxA, BBoxB)) {
             //a primeira imagem sempre será a nave
-            $('img:eq(0)').attr('src', 'images/explosao.gif-c200');
-            $('.estrela').attr('src', 'images/explosao.gif-c200');
+            $('img:eq(0), .estrela').attr('src', 'images/explosao.gif-c200');
             var acm = 0;
             var intervalMorte = setInterval(function() {
                 acm++;
@@ -174,17 +171,14 @@ function verificaBatida() {
                     //movimentando as estrelas para fingir um abalo
                     snowStorm.randomizeWind;
                     //esse código apaga a nave, balas e asteróides que estão na tela
-                    $('img:eq(0)').remove();
-                    $('.estrela').remove();
-                    $('.bala').remove();
+                    $('img:eq(0), .estrela, .bala').remove();
                     //limpando os intervals
                     clearInterval(intervalAsteroides);
                     clearInterval(intervalColisaoTiros);
                     clearInterval(intervalMorte);
                     clearInterval(intervalTiros);
                     //exibindo as labels
-                    $('#looseLabelA').show();
-                    $('#looseButton').show();
+                    $('#looseLabelA, #looseButton').show();
                     //voltando o cursor a tela
                     $("*").css("cursor", "default");
                 }
@@ -209,7 +203,7 @@ function verificaBatidaTiro() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 pontos++;
-                if (pontos <= 1000) {
+                if (pontos <= 10) {
                     $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
                     setTimeout(function() {
                         $('.explodiu').remove();
@@ -217,6 +211,17 @@ function verificaBatidaTiro() {
                     $('#pontos').html('Pontuação: ' + pontos);
                 } else {
                     //aqui vai surgir o boss 
+                    //limpando asteróides e balas da tela
+                    $('.estrela, .bala').remove();
+                    $('.vida').show();
+                    //limpando intervals necessários
+                    clearInterval(intervalColisaoTiros);
+                    clearInterval(intervalAsteroides);
+                    clearInterval(intervalColisao);
+                    clearInterval(intervalMorte);
+                    //avisando que o boss surgiu
+                    $('#pontos').html('Boss');
+                    nascerBoss();
                 }
             }
         });
@@ -224,4 +229,12 @@ function verificaBatidaTiro() {
 }
 
 intervalColisao = setInterval(verificaBatida, 20);
-intervalColisaoTiros = setInterval(verificaBatidaTiro, 20);
+intervalColisaoTiros = setInterval(verificaBatidaTiro, 10);
+
+//códigos do boss
+function nascerBoss() {
+    $('#boss').append($('<img/>').attr({
+        src: 'images/boss.png',
+        style: 'width:50px;height:50px;'
+    }));
+}
