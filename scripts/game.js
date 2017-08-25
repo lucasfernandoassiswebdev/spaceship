@@ -13,14 +13,34 @@ var graus = 0,
 
 $(document).ready(function() {
     //colocando a nave na tela
+    geraNave();
+
+    $('#looseLabelA, #looseButton').hide();
+
+    $('#looseButton').on('click', function() {
+        //é inicio novamente os intervals que haviam sido finalizados
+        intervalColisao = setInterval(verificaBatida, 200);
+        intervalColisaoTiros = setInterval(verificaBatidaTiro, 200);
+        intervalAsteroides = setInterval(geraAsteroide, tempo);
+        intervalTiros = setInterval(movimentaTiro, 15);
+        //tela de derrota é escondida novamente
+        $('#looseButton').hide();
+        $('#looseButton').hide();
+        $('#looseLabelA').hide();
+        //concertando o gameboard
+        $('#pontos').html('Pontuação: 0');
+        //é recolocada a nave na tela
+        geraNave();
+    });
+
+});
+
+function geraNave() {
     $('#nave').append($('<img/>').attr({
         src: 'images/nave2.png',
         style: 'width:50px;height:50px'
     }));
-
-    $('#looseLabelA, #looseButton').hide();
-});
-
+}
 var intervalAsteroides = setInterval(geraAsteroide, tempo);
 
 function geraAsteroide() {
@@ -51,7 +71,7 @@ $(document).on("mousemove", function(evt) {
 $(document).bind('click', atira);
 
 function atira() {
-    //encontrando as coordenadas da nave
+    //encontrando as coordenadas da nave e fazendo a bala aparecer na frente
     x = $('#nave')[0].getBoundingClientRect().left;
     y = $('#nave')[0].getBoundingClientRect().top;
     $('body').append($('<img/>').attr({
@@ -61,23 +81,41 @@ function atira() {
     }));
 }
 
-setInterval(function() {
+
+intervalTiros = setInterval(movimentaTiro, 20);
+
+function movimentaTiro() {
     $('.bala').each(function() {
-        var wTela = $('body').width();
+        var wTela = $(window).width();
         var hTela = $(window).height();
         var tTiro = $(this).position().top;
         var lTiro = $(this).position().left;
-
-        var top = this.getBoundingClientRect().top - 2;
-        $(this).css({
-            top: top + 'px',
-            //transform: 'rotate(' + graus + 'deg) translate(' + (parseFloat(wTela) - lTiro) + 'px, ' + (parseFloat(hTela) - tTiro) + 'px)'
-            transform: 'rotate(' + graus + 'deg)'
-        });
-        if (top < -80)
-            $(this).remove();
+        //caso a nave esteja reta irei utilizar esta variável
+        var top;
+        //caso não, vou usar essa
+        if (graus == 0) {
+            top = this.getBoundingClientRect().top - 15;
+            $(this).css({
+                top: top + 'px',
+                transform: 'rotate(' + graus + 'deg)'
+            });
+            if (top < -80)
+                $(this).remove();
+        } else if (graus == 180) {
+            top = this.getBoundingClientRect().top + 15;
+            $(this).css({
+                top: top + 'px',
+                transform: 'rotate(' + graus + 'deg)'
+            });
+            if (top > $(window).height())
+                $(this).remove();
+        } else {
+            $(this).css({
+                transform: 'rotate(' + graus + 'deg) translate(' + (parseFloat(wTela) - lTiro) + 'px, ' + (parseFloat(hTela) - tTiro) + 'px)'
+            });
+        }
     });
-}, );
+}
 
 window.onkeydown = function(e) {
     //pegando a tecla pressionada e rodando a nave
@@ -137,13 +175,22 @@ function verificaBatida() {
             var intervalMorte = setInterval(function() {
                 acm++;
                 if (acm >= 40) {
-                    //removemos a nave quando o gif termina de executar e redirecionamos para a tela de derrota
+                    //movimentando as estrelas para fingir um abalo
+                    snowStorm.randomizeWind;
+                    //esse código apaga a nave, balas e asteróides que estão na tela
                     $('img:eq(0)').remove();
                     $('.estrela').remove();
+                    $('.bala').remove();
+                    //limpando os intervals
+                    clearInterval(intervalAsteroides);
+                    clearInterval(intervalColisaoTiros);
+                    clearInterval(intervalMorte);
+                    clearInterval(intervalTiros);
+                    //exibindo as labels
                     $('#looseLabelA').show();
                     $('#looseButton').show();
-                    $('document').css('cursor', 'pointer')
-                    clearInterval(intervalMorte);
+                    //voltando o cursor a tela
+                    $("*").css("cursor", "default");
                 }
             }, 20);
             $('#pontos').html('Destruído');
@@ -180,5 +227,5 @@ function verificaBatidaTiro() {
     });
 }
 
-intervalColisao = setInterval(verificaBatida, 200);
-intervalColisaoTiros = setInterval(verificaBatidaTiro, 200);
+intervalColisao = setInterval(verificaBatida, 20);
+intervalColisaoTiros = setInterval(verificaBatidaTiro, 20);
