@@ -94,7 +94,7 @@ function atira() {
     $('body').append(
         $('<img/>').attr('src', 'images/bala.png').addClass('bala').css({
             position: 'absolute',
-            left: (x + valor) + 'px',
+            left: (x + valor + 7.8) + 'px',
             top: y + 'px',
             transform: 'rotate(' + graus + 'deg) translate(' + valor + 'px, ' + y + 'px)'
         }).attr("data-grau", graus).attr("data-eixo-x", valor)
@@ -109,10 +109,10 @@ function movimentaTiro() {
             $(this).remove();
         } else {
             $(this)
-                //.css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + ($(this).attr("data-eixo-x") + 30) + 'px, ' + eixoy + 'px)')
-                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate( 6.2px, ' + eixoy + 'px)')
-                .attr("data-eixo-y", eixoy);
+                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + $(this).attr('data-eixo-x') + 'px, ' + eixoy + 'px)')
+                .attr('data-eixo-y', eixoy);
         }
+        //console.log($(this).attr('data-eixo-x')); 
     });
 }
 
