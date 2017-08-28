@@ -46,7 +46,7 @@ function geraNave() {
 }
 
 var intervalAsteroides = setInterval(geraAsteroide, tempo);
-var intervalTiros = setInterval(movimentaTiro, 30);
+var intervalTiros = setInterval(movimentaTiro, 25);
 
 function geraAsteroide() {
     var tNave = $('#nave').position().top;
@@ -79,7 +79,16 @@ $(document).on("mousemove", function(evt) {
     $('#nave').css({ left: evt.pageX - 25, top: evt.pageY - 30 });
 });
 
-$(document).bind('click', atira);
+$(document).bind('click', function() {
+    if (lado == 'E') {
+        valor = -0;
+        lado = 'D';
+    } else {
+        valor = 20;
+        lado = 'E';
+    };
+    atira();
+});
 
 function atira() {
     x = $('#nave')[0].getBoundingClientRect().left;
@@ -109,25 +118,15 @@ function movimentaTiro() {
 */
 
 function movimentaTiro() {
-    if (lado == 'E') {
-        valor = -20;
-    } else {
-        valor = 20;
-    }
-
     $('.bala').each(function() {
         var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
 
         if (eixoy < -2000) {
             $(this).remove();
         } else {
-            $(this).css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + valor + 'px, ' + eixoy + 'px)').attr("data-eixo", eixoy);
-        }
-
-        if (lado == 'E') {
-            lado = 'D';
-        } else {
-            lado = 'E';
+            $(this)
+                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + valor + 'px, ' + eixoy + 'px)')
+                .attr("data-eixo", eixoy);
         }
     });
 }
