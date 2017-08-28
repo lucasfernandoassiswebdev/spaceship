@@ -223,13 +223,14 @@ function verificaBatidaTiro() {
                 //que eles levam para nascer
                 pontos++;
                 tempo--;
-                if (pontos <= 15) {
+                if (pontos <= 150) {
                     clearInterval(intervalAsteroides);
                     intervalAsteroides = setInterval(geraAsteroide, tempo);
                     $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
                     setTimeout(function() {
                         $('.explodiu').remove();
-                    }, 400);
+                        BBoxA[0].remove();
+                    }, 600);
                     $('#pontos').html('Pontuação: ' + pontos);
                 } else {
                     nascerBoss();
@@ -240,8 +241,8 @@ function verificaBatidaTiro() {
     });
 }
 
-intervalColisao = setInterval(verificaBatida, 20);
-intervalColisaoTiros = setInterval(verificaBatidaTiro, 50);
+intervalColisao = setInterval(verificaBatida, 10);
+intervalColisaoTiros = setInterval(verificaBatidaTiro, 10);
 
 /////////////////////////////////////////////////códigos do boss/////////////////////////////////////////////////////////
 function nascerBoss() {
