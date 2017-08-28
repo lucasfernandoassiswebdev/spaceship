@@ -10,11 +10,15 @@ var vida = 1000,
     speed = 3,
     xBoss,
     yBoss,
-    tempoTiroBoss = 1000;
+    tempoTiroBoss = 1000,
+    lado = 'D',
+    valor = 14;
 
 $(document).ready(function() {
     geraNave();
+
     $('#looseLabelA, #looseButton, .vida').hide();
+
     $('#looseButton').on('click', function() {
         vida = 1000;
         tempo = 2000;
@@ -37,12 +41,12 @@ $(document).ready(function() {
 function geraNave() {
     $('#nave').append($('<img/>').attr({
         src: 'images/nave2.png',
-        style: 'width:50px;height:50px;transform:rotate(0deg)'
+        style: 'width:50px;height:50px;'
     }));
 }
 
 var intervalAsteroides = setInterval(geraAsteroide, tempo);
-var intervalTiros = setInterval(movimentaTiro, 20);
+var intervalTiros = setInterval(movimentaTiro, 30);
 
 function geraAsteroide() {
     var tNave = $('#nave').position().top;
@@ -82,7 +86,7 @@ function atira() {
     y = $('#nave')[0].getBoundingClientRect().top;
     $('body').append($('<img/>').attr({
         src: 'images/bala.png',
-        style: 'left: ' + (x + 15) + 'px; top: ' + (y - 30) + 'px; transform: rotate(' + graus + 'deg);',
+        style: 'left: ' + (x + valor) + 'px; top: ' + y + 'px; transform: rotate(' + graus + 'deg);',
         class: 'bala'
     }).attr("data-grau", graus));
 }
@@ -105,14 +109,25 @@ function movimentaTiro() {
 */
 
 function movimentaTiro() {
+    if (lado == 'E') {
+        valor = -20;
+    } else {
+        valor = 20;
+    }
+
     $('.bala').each(function() {
         var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
-        if (eixoy < -800) {
+
+        if (eixoy < -2000) {
             $(this).remove();
         } else {
-            $(this).css({
-                transform: 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + 0 + 'px, ' + eixoy + 'px)'
-            }).attr("data-eixo", eixoy);
+            $(this).css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + valor + 'px, ' + eixoy + 'px)').attr("data-eixo", eixoy);
+        }
+
+        if (lado == 'E') {
+            lado = 'D';
+        } else {
+            lado = 'E';
         }
     });
 }
@@ -203,7 +218,7 @@ function verificaBatidaTiro() {
                 pontos++;
                 tempo--;
 
-                if (pontos < 10) {
+                if (pontos < 25) {
                     clearInterval(intervalAsteroides);
                     intervalAsteroides = setInterval(geraAsteroide, tempo);
 
@@ -331,7 +346,7 @@ function verificaTiroNaveBoss() {
 
             if (rectIntersect(BBoxA, BBoxB)) {
                 excluir = true;
-                vida -= 2;
+                vida -= 7;
                 var porcentagem = (vida * 100) / 1000;
 
                 $('.vida').addClass('efeitoPerca').css('width', porcentagem + '%');
@@ -382,6 +397,8 @@ function verificaTiroBossNave() {
 
                 setTimeout(function() {
                     limpaIntervals();
+
+                    graus = 0;
 
                     $('img').remove();
                     $('#looseButton').show();
