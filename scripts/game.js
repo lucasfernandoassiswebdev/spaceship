@@ -12,7 +12,8 @@ var vida = 1000,
     yBoss,
     tempoTiroBoss = 1000,
     lado = 'D',
-    valor = 20;
+    valor = 7.8,
+    nasceAsteroide = false;
 
 $(document).ready(function() {
     geraNave();
@@ -42,7 +43,7 @@ function geraNave() {
     $('#nave').append($('<img/>').attr("src", 'images/nave2.png'));
 }
 
-var intervalAsteroides = setInterval(geraAsteroide, tempo);
+var intervalAsteroides = nasceAsteroide ? setInterval(geraAsteroide, tempo) : undefined;
 var intervalTiros = setInterval(movimentaTiro, 25);
 
 function geraAsteroide() {
@@ -77,13 +78,13 @@ $(document).on("mousemove", function(evt) {
 });
 
 $(document).bind('click', function() {
-    if (lado == 'E') {
-        valor = 3;
-        lado = 'D';
-    } else {
-        valor = 13;
-        lado = 'E';
-    };
+    // if (lado == 'E') {
+    //     valor = 3;
+    //     lado = 'D';
+    // } else {
+    //     valor = 13;
+    //     lado = 'E';
+    // };
     atira();
 });
 
@@ -95,21 +96,22 @@ function atira() {
             position: 'absolute',
             left: (x + valor) + 'px',
             top: y + 'px',
-            transform: 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + (x + valor) + 'px, ' + y + 'px)'
-        }).attr("data-grau", graus)
+            transform: 'rotate(' + graus + 'deg) translate(' + valor + 'px, ' + y + 'px)'
+        }).attr("data-grau", graus).attr("data-eixo-x", valor)
     );
 }
 
 function movimentaTiro() {
     $('.bala').each(function() {
-        var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
+        var eixoy = (+$(this).attr("data-eixo-y") || 0) - 20;
 
         if (eixoy < -2000) {
             $(this).remove();
         } else {
             $(this)
-                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + valor + 'px, ' + eixoy + 'px)')
-                .attr("data-eixo", eixoy);
+                //.css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + ($(this).attr("data-eixo-x") + 30) + 'px, ' + eixoy + 'px)')
+                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate( 6.2px, ' + eixoy + 'px)')
+                .attr("data-eixo-y", eixoy);
         }
     });
 }
@@ -160,7 +162,7 @@ setInterval(function() {
 
 function verificaBatida() {
     var nave = $("#nave");
-    var asteroides = $(".estrela");
+    var asteroides = $(".estrela:not(.explodiu)");
 
     var rangeIntersect = function(min0, max0, min1, max1) {
         return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
@@ -174,12 +176,12 @@ function verificaBatida() {
     asteroides.each(function() {
         var BBoxB = this.getBoundingClientRect();
         if (rectIntersect(BBoxA, BBoxB)) {
-            $('img:eq(0), .estrela').attr('src', 'images/explosao.gif-c200');
+            $('#nave img').attr('src', 'images/explosao.gif-c200');
 
             setTimeout(function() {
                 graus = 0;
 
-                $('img:eq(0), .estrela, .bala').remove();
+                $('#nave img, .estrela, .bala').remove();
                 $('#looseLabelA, #looseButton').show();
                 $("*").css("cursor", "default");
 
@@ -205,7 +207,7 @@ function verificaBatidaTiro() {
 
     $(".bala").each(function() {
         var BBoxA = this.getBoundingClientRect();
-        $(".estrela").each(function() {
+        $(".estrela:not(.explodiu)").each(function() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 excluir = true;
@@ -216,7 +218,11 @@ function verificaBatidaTiro() {
                     clearInterval(intervalAsteroides);
                     intervalAsteroides = setInterval(geraAsteroide, tempo);
 
-                    $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
+                    $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu").css({
+                        animation: "none",
+                        top: BBoxB.top + "px",
+                        left: BBoxB.left + "px"
+                    });
                     setTimeout(function() {
                         $('.explodiu').remove();
                     }, 600);
@@ -312,7 +318,7 @@ function batidaBoss() {
             $('img:eq(0), .estrela, .boss').attr('src', 'images/explosao.gif-c200');
             setTimeout(function() {
                 graus = 0;
-                $('img:eq(0), .estrela, .bala, .bossShoot').remove();
+                $('img:eq(0), .estrela, .bala, .bossShoot, .boss').remove();
                 limpaIntervals();
                 $('#looseLabelA, #looseButton').show();
                 $("*").css("cursor", "default");

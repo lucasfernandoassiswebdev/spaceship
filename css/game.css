@@ -8,6 +8,8 @@
 }
 
 body {
+    background-attachment: fixed;
+    background-size: cover;
     background-image: url(../images/fundo.jpg);
     overflow: hidden;
 }
