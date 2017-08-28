@@ -175,23 +175,18 @@ function verificaBatida() {
         var BBoxB = this.getBoundingClientRect();
         if (rectIntersect(BBoxA, BBoxB)) {
             $('img:eq(0), .estrela').attr('src', 'images/explosao.gif-c200');
-            var acm = 0;
 
-            var intervalMorte = setInterval(function() {
-                acm++;
-                if (acm >= 40) {
-                    graus = 0;
+            setTimeout(function() {
+                graus = 0;
 
-                    $('img:eq(0), .estrela, .bala').remove();
-                    $('#looseLabelA, #looseButton').show();
-                    $("*").css("cursor", "default");
+                $('img:eq(0), .estrela, .bala').remove();
+                $('#looseLabelA, #looseButton').show();
+                $("*").css("cursor", "default");
 
-                    clearInterval(intervalAsteroides);
-                    clearInterval(intervalColisaoTiros);
-                    clearInterval(intervalMorte);
-                    clearInterval(intervalTiros);
-                }
-            }, 20);
+                clearInterval(intervalAsteroides);
+                clearInterval(intervalColisaoTiros);
+                clearInterval(intervalTiros);
+            }, 400);
 
             $('#pontos').html('Destruído');
         }
