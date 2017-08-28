@@ -12,7 +12,7 @@ var vida = 1000,
     yBoss,
     tempoTiroBoss = 1000,
     lado = 'D',
-    valor = 14;
+    valor = 20;
 
 $(document).ready(function() {
     geraNave();
@@ -39,10 +39,7 @@ $(document).ready(function() {
 });
 
 function geraNave() {
-    $('#nave').append($('<img/>').attr({
-        src: 'images/nave2.png',
-        style: 'width:50px;height:50px;'
-    }));
+    $('#nave').append($('<img/>').attr("src", 'images/nave2.png'));
 }
 
 var intervalAsteroides = setInterval(geraAsteroide, tempo);
@@ -81,10 +78,10 @@ $(document).on("mousemove", function(evt) {
 
 $(document).bind('click', function() {
     if (lado == 'E') {
-        valor = -0;
+        valor = 3;
         lado = 'D';
     } else {
-        valor = 20;
+        valor = 13;
         lado = 'E';
     };
     atira();
@@ -93,11 +90,28 @@ $(document).bind('click', function() {
 function atira() {
     x = $('#nave')[0].getBoundingClientRect().left;
     y = $('#nave')[0].getBoundingClientRect().top;
-    $('body').append($('<img/>').attr({
-        src: 'images/bala.png',
-        style: 'left: ' + (x + valor) + 'px; top: ' + y + 'px; transform: rotate(' + graus + 'deg);',
-        class: 'bala'
-    }).attr("data-grau", graus));
+    $('body').append(
+        $('<img/>').attr('src', 'images/bala.png').addClass('bala').css({
+            position: 'absolute',
+            left: (x + valor) + 'px',
+            top: y + 'px',
+            transform: 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + (x + valor) + 'px, ' + y + 'px)'
+        }).attr("data-grau", graus)
+    );
+}
+
+function movimentaTiro() {
+    $('.bala').each(function() {
+        var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
+
+        if (eixoy < -2000) {
+            $(this).remove();
+        } else {
+            $(this)
+                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + valor + 'px, ' + eixoy + 'px)')
+                .attr("data-eixo", eixoy);
+        }
+    });
 }
 
 /* 
@@ -116,20 +130,6 @@ function movimentaTiro() {
     });
 }
 */
-
-function movimentaTiro() {
-    $('.bala').each(function() {
-        var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
-
-        if (eixoy < -2000) {
-            $(this).remove();
-        } else {
-            $(this)
-                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + valor + 'px, ' + eixoy + 'px)')
-                .attr("data-eixo", eixoy);
-        }
-    });
-}
 
 window.onkeydown = function(e) {
     var key = e.keyCode ? e.keyCode : e.which;
