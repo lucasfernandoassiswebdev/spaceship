@@ -49,7 +49,7 @@ body {
 
 .efeitoPerca {
     animation-name: efeitoPercaVida;
-    animation-duration: 1s;
+    animation-duration: 0.3s;
 }
 
 button {
@@ -71,10 +71,10 @@ button {
 }
 
 @keyframes efeitoPercaVida {
-    from {
+    0% {
         background-color: green;
     }
-    to {
+    100% {
         background-color: red;
     }
 }

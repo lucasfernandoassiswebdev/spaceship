@@ -1,15 +1,16 @@
-//variáveis de controle do jogo
-var vida = 100,
+var vida = 1000,
     x2 = 0,
     y2 = 0,
     pontos = 0,
     tempo = 2000,
-    pedras = 0;
-
-//variáveis para lidar com a rotação da nave
-var graus = 0,
-    right, left, speed = 3,
-    xBoss, yBoss, tempoTiroBoss = 500;
+    pedras = 0,
+    graus = 0,
+    right,
+    left,
+    speed = 3,
+    xBoss,
+    yBoss,
+    tempoTiroBoss = 1000;
 
 $(document).ready(function() {
     //colocando a nave na tela
@@ -18,6 +19,8 @@ $(document).ready(function() {
     $('#looseLabelA, #looseButton, .vida').hide();
     //restartando o jogo
     $('#looseButton').on('click', function() {
+        vida = 1000;
+        $('.vida').hide();
         tempo = 2000;
         $('.estrela').remove();
         //zerando os pontos
@@ -43,7 +46,9 @@ function geraNave() {
         style: 'width:50px;height:50px;'
     }));
 }
+
 var intervalAsteroides = setInterval(geraAsteroide, tempo);
+var intervalTiros = setInterval(movimentaTiro, 20);
 
 function geraAsteroide() {
     //esses números serão sorteados para fazer com que os asteróides nasçam em lugares aleatórios e dentro da tela
@@ -92,8 +97,6 @@ function atira() {
         class: 'bala'
     }).attr("data-grau", graus));
 }
-
-intervalTiros = setInterval(movimentaTiro, 20);
 
 /* 
 function movimentaTiro() {
@@ -187,7 +190,6 @@ function verificaBatida() {
                     snowStorm.randomizeWind;
                     //esse código apaga a nave, balas e asteróides que estão na tela
                     $('img:eq(0), .estrela, .bala').remove();
-                    //limpando os intervals
                     clearInterval(intervalAsteroides);
                     clearInterval(intervalColisaoTiros);
                     clearInterval(intervalMorte);
@@ -220,25 +222,18 @@ function verificaBatidaTiro() {
                 //quando o tiro acertar um asteróide aumenta os pontos e diminui o tempo
                 //que eles levam para nascer
                 pontos++;
-                tempo -= 100;
-                clearInterval(intervalAsteroides);
-                intervalAsteroides = setInterval(geraAsteroide, tempo);
-                if (pontos <= 10) {
+                tempo--;
+                if (pontos <= 15) {
+                    clearInterval(intervalAsteroides);
+                    intervalAsteroides = setInterval(geraAsteroide, tempo);
                     $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
                     setTimeout(function() {
                         $('.explodiu').remove();
                     }, 400);
                     $('#pontos').html('Pontuação: ' + pontos);
                 } else {
-                    //aqui vai surgir o boss 
-                    //limpando asteróides e balas da tela
-                    $('.estrela, .bala').remove();
-                    $('.vida').show();
-                    //limpando intervals necessários
-                    clearInterval(intervalAsteroides);
-                    //avisando que o boss surgiu
-                    $('#pontos').html('Boss');
                     nascerBoss();
+                    clearInterval(intervalColisaoTiros);
                 }
             }
         });
@@ -246,10 +241,14 @@ function verificaBatidaTiro() {
 }
 
 intervalColisao = setInterval(verificaBatida, 20);
-intervalColisaoTiros = setInterval(verificaBatidaTiro, 10);
+intervalColisaoTiros = setInterval(verificaBatidaTiro, 50);
 
 /////////////////////////////////////////////////códigos do boss/////////////////////////////////////////////////////////
 function nascerBoss() {
+    $('.estrela').remove();
+    clearInterval(intervalAsteroides);
+    $('#pontos').html('Boss');
+    $('.vida').show();
     $('#boss').append($('<img/>').attr({
         src: 'images/inimigo.png',
         style: 'width:150px;height:150px;transform:rotate(90deg)',
@@ -263,21 +262,21 @@ function nascerBoss() {
     //verificando se algum tiro acertou
     intervalNaveBoss = setInterval(verificaTiroNaveBoss, 20)
     intervalBossNave = setInterval(verificaTiroBossNave, 20);
-    //setando a vida do boss 
-    vida = 1000;
     //aumentando a dificuldade do boss
     //a cada 4 segundos enfrentando o boss ele fica mais difícil e a cada 2 ele regenera vida
-    intervalRegen = setInterval(function() {
-        //regeneração de vida do boss
-        vida += 300;
-    }, 2000);
     intervalAumentaDificuldade = setInterval(function() {
         if (tempoTiroBoss >= 101) {
             clearInterval(intervalTirosBoss);
-            tempoTiroBoss -= 25;
+            tempoTiroBoss -= 75;
             intervalTirosBoss = setInterval(bossShoot, tempoTiroBoss);
         }
     }, 4000);
+    intervalRegen = setInterval(function() {
+        //regeneração de vida do boss
+        if (vida <= 950) {
+            vida += 50;
+        }
+    }, 4500);
 }
 
 function bossShoot() {
@@ -322,7 +321,7 @@ function batidaBoss() {
             $('img:eq(0), .estrela, .boss').attr('src', 'images/explosao.gif-c200');
             setTimeout(function() {
                 graus = 0;
-                $('img:eq(0), .estrela, .bala').remove();
+                $('img:eq(0), .estrela, .bala, .bossShoot').remove();
                 limpaIntervals();
                 $('#looseLabelA, #looseButton').show();
                 $("*").css("cursor", "default");
@@ -347,9 +346,16 @@ function verificaTiroNaveBoss() {
         $(".boss").each(function() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
-                vida--;
-                $('.boss').addClass('efeitoPerca');
+                vida -= 2;
+                var porcentagem = (vida * 100) / 1000;
+                $('.vida').addClass('efeitoPerca');
+                $('.vida').css('width', porcentagem + '%');
+                setTimeout(function() {
+                    $('.vida').removeClass('efeitoPerca');
+                }, 300);
+                $('#pontos').html('Boss vida: ' + vida);
                 if (vida <= 0) {
+                    limpaIntervals();
                     $('#pontos').html('You win');
                     $('.boss').attr('src', 'images/explosao.gif-c200');
                     setTimeout(function() {
@@ -378,7 +384,7 @@ function verificaTiroBossNave() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 $('#pontos').html('Você foi destruído');
-                $('#nave').attr('src', 'images/explosao.gif-c200');
+                $(this).attr('src', 'images/explosao.gif-c200');
                 setTimeout(function() {
                     limpaIntervals();
                     $('.boss, img').remove();
