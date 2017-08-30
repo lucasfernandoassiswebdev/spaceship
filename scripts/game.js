@@ -29,9 +29,9 @@ $(document).ready(function() {
 
     $('#looseButton').on('click', function() {
         boss.vida = 1000;
+        boss.tempoTiroBoss = 1000;
         tempo = 2000;
         pontos = 0;
-        tempoTiroBoss = 1000;
 
         $('#looseLabelA, #looseButton, .vida').hide();
         $('.estrela').remove();
@@ -52,13 +52,15 @@ function geraNave() {
 }
 
 function geraAsteroide() {
-    var tNave = $('#nave').position().top;
-    var lNave = $('#nave').position().left;
+    naveObj.y = $('#nave').position().top;
+    naveObj.x = $('#nave').position().left;
+
     var size = Math.floor(Math.random() * 100) + 50;
     var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
     var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
+
     //verificando se o asteróide não nasceu muito próximo a nave
-    while (marginl >= (lNave - 300) && marginl <= (lNave + 200) && margint >= (tNave - 300) && margint <= (tNave + 300)) {
+    while (marginl >= (naveObj.x - 300) && marginl <= (naveObj.x + 200) && margint >= (naveObj.y - 300) && margint <= (naveObj.y + 300)) {
         var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
         var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
     }
@@ -362,17 +364,17 @@ function verificaTiroNaveBoss() {
 
             if (rectIntersect(BBoxA, BBoxB)) {
                 excluir = true;
-                boss.vida -= 7;
-                var porcentagem = (boss.vida * 100) / 1000;
+                bossObj.vida -= 7;
+                var porcentagem = (bossObj.vida * 100) / 1000;
 
                 $('.vida').addClass('efeitoPerca').css('width', porcentagem + '%');
-                $('#pontos').html('Boss vida: ' + boss.vida);
+                $('#pontos').html('Boss vida: ' + bossObj.vida);
 
                 setTimeout(function() {
                     $('.vida').removeClass('efeitoPerca');
                 }, 300);
 
-                if (boss.vida <= 0) {
+                if (bossObj.vida <= 0) {
                     limpaIntervals();
 
                     $('#pontos').html('Você destruiu o boss <br/> Você venceu');
