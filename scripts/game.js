@@ -8,12 +8,12 @@ var naveObj = {
     y: 0,
     graus: 0,
     lado: 'D',
-    speed: 3,
+    velocidade: 3,
     valor: 14
 };
 //variáveis de controle de rotação da nave
-var right,
-    left;
+var direita,
+    esquerda;
 //variáveis de controle do boss
 var bossObj = {
     vida: 1000,
@@ -28,8 +28,8 @@ $(document).ready(function() {
     $('#looseLabelA, #looseButton, .vida').hide();
 
     $('#looseButton').on('click', function() {
-        boss.vida = 1000;
-        boss.tempoTiroBoss = 1000;
+        bossObj.vida = 1000;
+        bossObj.tempoTiroBoss = 1000;
         tempo = 2000;
         pontos = 0;
 
@@ -55,7 +55,7 @@ function geraAsteroide() {
     naveObj.y = $('#nave').position().top;
     naveObj.x = $('#nave').position().left;
 
-    var size = Math.floor(Math.random() * 100) + 50;
+    var tamanho = Math.floor(Math.random() * 100) + 50;
     var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
     var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
 
@@ -67,7 +67,7 @@ function geraAsteroide() {
 
     $('body').append($('<img/>').attr({
         src: 'images/asteroide.png',
-        style: 'width: ' + size + 'px; height: ' + size + 'px; left: ' + marginl + 'px; top: ' + margint + 'px;',
+        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: ' + margint + 'px;',
         class: 'estrela'
     }));
 
@@ -145,26 +145,26 @@ function movimentaTiroTeleguiado() {
 window.onkeydown = function(e) {
     var key = e.keyCode ? e.keyCode : e.which;
     if (key == 68)
-        right = true;
+        direita = true;
     if (key == 65)
-        left = true;
+        esquerda = true;
 }
 
 window.onkeyup = function(e) {
     var key = e.keyCode ? e.keyCode : e.which;
     if (key == 68)
-        right = undefined;
+        direita = undefined;
     if (key == 65)
-        left = undefined;
+        esquerda = undefined;
 }
 
 setInterval(function() {
-    if (!left && !right)
+    if (!esquerda && !direita)
         return;
-    if (left)
-        naveObj.graus -= naveObj.speed;
-    if (right)
-        naveObj.graus += naveObj.speed;
+    if (esquerda)
+        naveObj.graus -= naveObj.velocidade;
+    if (direita)
+        naveObj.graus += naveObj.velocidade;
 
     $('#nave').css('transform', 'rotate(' + naveObj.graus + 'deg)');
 }, 10);
@@ -287,29 +287,29 @@ function nascerBoss() {
 
     //regenera a vida do boss 
     intervalRegen = setInterval(function() {
-        if (boss.vida <= 950) {
-            boss.vida += 50;
+        if (bossObj.vida <= 950) {
+            bossObj.vida += 50;
         }
     }, 4500);
 }
 
 function bossShoot() {
-    boss.y = $('.boss').position().top;
+    bossObj.y = $('.boss').position().top;
 
     $('body').append($('<img/>').attr({
         src: 'images/balaBoss.png',
-        style: 'position:absolute; left: 160px; top: ' + (boss.y + 62.5) + 'px; width: 20px; height: 20px',
+        style: 'position:absolute; left: 160px; top: ' + (bossObj.y + 62.5) + 'px; width: 20px; height: 20px',
         class: 'bossShoot',
-    }).attr("data-left", 160));
+    }).attr("data-esquerda", 160));
 }
 
 function movimentaTiroBoss() {
     $('.bossShoot').each(function() {
-        var pixels = (+$(this).attr("data-left")) + 20;
+        var pixels = (+$(this).attr("data-esquerda")) + 20;
         if (pixels > $(window).width()) {
             $(this).remove();
         } else {
-            $(this).css('left', pixels).attr('data-left', pixels);
+            $(this).css('left', pixels).attr('data-esquerda', pixels);
         }
     });
 }
@@ -317,7 +317,7 @@ function movimentaTiroBoss() {
 function batidaBoss() {
     //colisão entre a nave e o boss
     var nave = $("#nave");
-    var asteroides = $(".boss");
+    var boss = $(".boss");
 
     var rangeIntersect = function(min0, max0, min1, max1) {
         return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
@@ -328,22 +328,23 @@ function batidaBoss() {
     }
 
     var BBoxA = nave[0].getBoundingClientRect();
-    asteroides.each(function() {
-        var BBoxB = this.getBoundingClientRect();
-        if (rectIntersect(BBoxA, BBoxB)) {
-            $('#nave img, .boss').attr('src', 'images/explosao.gif-c200');
-            setTimeout(function() {
-                naveObj.graus = 0;
+    var BBoxB = boss[0].getBoundingClientRect();
 
-                $('#nave img, .bala, .bossShoot, .boss').remove();
-                $('#looseLabelA, #looseButton').show();
-                $("*").css("cursor", "default");
+    if (rectIntersect(BBoxA, BBoxB)) {
+        $('#nave img, .boss').attr('src', 'images/explosao.gif-c200');
 
-                limpaIntervals();
-            }, 400);
-            $('#pontos').html('Destruído');
-        }
-    });
+        setTimeout(function() {
+            naveObj.graus = 0;
+
+            $('#nave img, .bala, .bossShoot, .boss').remove();
+            $('#looseLabelA, #looseButton').show();
+            $("*").css("cursor", "default");
+
+            limpaIntervals();
+        }, 500);
+
+        $('#pontos').html('Destruído');
+    }
 }
 
 function verificaTiroNaveBoss() {
