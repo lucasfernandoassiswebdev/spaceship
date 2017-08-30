@@ -41,7 +41,7 @@ body {
 
 .gameboard {
     position: absolute;
-    bottom: -20px;
+    bottom: 10px;
     font-size: 40px;
     color: white;
     margin-left: 43%;
