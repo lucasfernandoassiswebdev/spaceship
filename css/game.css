@@ -34,8 +34,6 @@ body {
     position: absolute;
     width: 20px;
     height: 20px;
-    animation-name: moveBala;
-    animation-duration: 4s;
 }
 
 .gameboard {
@@ -98,6 +96,21 @@ button {
     z-index: 50;
 }
 
+.efeitoGanho {
+    animation-name: efeitoGanhoVida;
+    animation-duration: 0.8s;
+}
+
+.desceDireita {
+    animation-name: desceD;
+    animation-duration: 2s linear;
+}
+
+.desceEsquerda {
+    animation-name: desceE;
+    animation-duration: 2s linear;
+}
+
 @keyframes efeitoPercaVida {
     0% {
         background-color: green;
@@ -107,12 +120,12 @@ button {
     }
 }
 
-@keyframes orbita {
-    from {
-        transform: rotate(0deg) translateX(150px) rotate(0deg);
+@keyframes efeitoGanhoVida {
+    0% {
+        background-color: green;
     }
-    to {
-        transform: rotate(360deg) translateX(150px) rotate(-360deg);
+    100% {
+        background-color: blue;
     }
 }
 
@@ -121,7 +134,7 @@ button {
         transform: translate(0px, 0px);
     }
     to {
-        transform: translate(800px, 638px);
+        transform: translate(500px, 1000px);
     }
 }
 
@@ -130,18 +143,18 @@ button {
         transform: translate(0px, 0px);
     }
     to {
-        transform: translate(-800px, 638px);
+        transform: translate(-500px, 1000px);
     }
 }
 
 @keyframes MoveUpDown {
     0% {
-        bottom: 0;
+        bottom: -5px;
     }
     50% {
         bottom: 700px;
     }
     100% {
-        bottom: 0;
+        bottom: -5px;
     }
 }

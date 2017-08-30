@@ -1,7 +1,6 @@
 //variáveis de controle de jogo
 var pontos = 0,
-    tempo = 2000,
-    pedras = 0;
+    tempo = 2000;
 //variáveis de controle da nave
 var naveObj = {
     graus: 0,
@@ -19,7 +18,7 @@ var bossObj = {
     tempoTiroBoss: 1000
 }
 var nasceAsteroide = true;
-var animacoes = ['desceD', 'desceE'];
+var animacoes = ['desceEsquerda', 'desceDireita'];
 
 $(document).ready(function() {
     geraNave();
@@ -54,28 +53,21 @@ function geraAsteroide() {
     var tamanho = Math.floor(Math.random() * 100) + 50;
     var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
 
-    //sorteando animação asteróide
+    //sorteando a animação
     var animacao = Math.floor(Math.random() * 2) + 0;
+
+    //mudando efeito estrelas
+    snowStorm.randomizeWind();
 
     $('body').append($('<img/>').attr({
         src: 'images/asteroide.png',
-        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: ' + -50 + 'px;',
-        class: 'estrela'
-    }).css('animation', animacoes[animacao] + ' 1.5s linear'));
-
-    pedras = $('.estrela').length;
-
-    if (pedras == 10) {
-        //se as pedras atingirem 10, espera-se um certo tempo antes de gerar mais
-        clearInterval(intervalAsteroides);
-        setTimeout(function() {
-            intervalAsteroides = setInterval(geraAsteroide, tempo);
-        }, 4000);
-    }
+        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: ' + -100 + 'px;',
+        class: 'estrela ' + animacoes[animacao]
+    }));
 
     setTimeout(function() {
         $('.estrela:not(.explodiu):eq(0)').remove();
-    }, 4000);
+    }, 2500);
 }
 
 $(document).on("mousemove", function(evt) {
@@ -276,7 +268,7 @@ function nascerBoss() {
     intervalAumentaDificuldade = setInterval(function() {
         if (bossObj.tempoTiroBoss >= 101) {
             clearInterval(intervalTirosBoss);
-            bossObj.tempoTiroBoss -= 75;
+            bossObj.tempoTiroBoss -= 40;
             intervalTirosBoss = setInterval(bossShoot, bossObj.tempoTiroBoss);
         }
     }, 4000);
@@ -285,6 +277,13 @@ function nascerBoss() {
     intervalRegen = setInterval(function() {
         if (bossObj.vida <= 950) {
             bossObj.vida += 50;
+
+            $('#pontos').html('Boss vida: ' + bossObj.vida);
+            $('.vida').addClass('efeitoGanho');
+
+            setTimeout(function() {
+                $('.vida').removeClass('efeitoGanhoVida');
+            }, 400);
         }
     }, 4500);
 }
@@ -378,10 +377,10 @@ function verificaTiroNaveBoss() {
                     $('.boss').attr('src', 'images/explosao.gif-c200');
 
                     setTimeout(function() {
-                        $('.boss').remove();
+                        $('.boss, .bossShoot, #nave img').remove();
                         $('#looseButton').show();
                         $('*').css('cursor', 'default');
-                    }, 400);
+                    }, 500);
                 }
             }
         });
