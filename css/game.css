@@ -16,11 +16,7 @@ body {
 
 #nave {
     position: absolute;
-<<<<<<< HEAD
-    z-index: 9999;
-=======
     z-index: 0;
->>>>>>> e3bb53bece7840c3f78a1145a5e52347352e7678
     width: 50px;
     height: 50px;
 }
@@ -45,7 +41,7 @@ body {
 
 .gameboard {
     position: absolute;
-    bottom: 20px;
+    bottom: -20px;
     font-size: 40px;
     color: white;
     margin-left: 43%;
@@ -81,6 +77,26 @@ button {
     position: absolute;
     left: 0;
     bottom: 0;
+}
+
+.titulo {
+    margin: 0 auto;
+    color: white;
+    font-size: 60px;
+    margin-left: 38%;
+}
+
+.labelDerrota {
+    margin: 0 auto;
+    color: white;
+    font-size: 120px;
+    margin-left: 27%;
+    margin-top: 3%;
+    z-index: 50;
+}
+
+.buttonDerrota {
+    z-index: 50;
 }
 
 @keyframes efeitoPercaVida {
