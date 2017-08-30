@@ -7,33 +7,14 @@
     -ms-user-select: none;
 }
 
+
+/*estilizações tela jogo*/
+
 body {
     background-attachment: fixed;
     background-size: cover;
     background-image: url(../images/fundo.jpg);
     overflow: hidden;
-}
-
-#nave {
-    position: absolute;
-    z-index: 0;
-    width: 50px;
-    height: 50px;
-}
-
-#nave img {
-    width: 100%;
-    height: 100%;
-}
-
-.estrela {
-    position: absolute;
-}
-
-.bala {
-    position: absolute;
-    width: 20px;
-    height: 20px;
 }
 
 .gameboard {
@@ -44,26 +25,7 @@ body {
     margin-left: 43%;
 }
 
-.vida {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 20px;
-    background-color: green;
-}
-
-.efeitoPerca {
-    animation-name: efeitoPercaVida;
-    animation-duration: 0.3s;
-}
-
-.efeitoGanho {
-    animation-name: efeitoGanhoVida;
-    animation-duration: 0.8s;
-}
-
-button {
+.button {
     position: absolute;
     top: 50%;
     left: 44%;
@@ -72,13 +34,6 @@ button {
     background-color: white;
     border: 1px solid white;
     border-radius: 25px;
-}
-
-.boss {
-    animation: MoveUpDown 3s linear infinite;
-    position: absolute;
-    left: 0;
-    bottom: 0;
 }
 
 .titulo {
@@ -99,6 +54,57 @@ button {
 
 .buttonDerrota {
     z-index: 50;
+}
+
+
+/*estilizações do jogo em si*/
+
+#nave {
+    position: absolute;
+    z-index: 0;
+    width: 50px;
+    height: 50px;
+}
+
+#nave img {
+    width: 100%;
+    height: 100%;
+}
+
+.bala {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+}
+
+.estrela {
+    position: absolute;
+}
+
+.boss {
+    animation: MoveUpDown 3s linear infinite;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+.vida {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background-color: green;
+}
+
+.efeitoPerca {
+    animation-name: efeitoPercaVida;
+    animation-duration: 0.3s;
+}
+
+.efeitoGanho {
+    animation-name: efeitoGanhoVida;
+    animation-duration: 0.8s;
 }
 
 .desceDireita {
