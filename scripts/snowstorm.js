@@ -249,10 +249,16 @@ var snowStorm = (function(window, document) {
         return (parseInt(rnd(2), 10) === 1 ? n * -1 : n);
     }
 
-    this.randomizeWind = function() {
+    this.randomizeWind = function(x = null, y = null) {
         var i;
-        vRndX = plusMinus(rnd(storm.vMaxX, 0.2));
-        vRndY = rnd(storm.vMaxY, 0.2);
+        if (!x && !y){
+            vRndX = -10;
+            vRndY = 10;
+        }else{
+            vRndX = x; 
+            vRndY = y; 
+        }
+
         if (this.flakes) {
             for (i = 0; i < this.flakes.length; i++) {
                 if (this.flakes[i].active) {

@@ -102,13 +102,11 @@ button {
 }
 
 .desceDireita {
-    animation-name: desceD;
-    animation-duration: 2s linear;
+    animation: desceD 2s linear;
 }
 
 .desceEsquerda {
-    animation-name: desceE;
-    animation-duration: 2s linear;
+    animation: desceE 2s linear;
 }
 
 @keyframes efeitoPercaVida {

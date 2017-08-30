@@ -51,23 +51,27 @@ function geraNave() {
 
 function geraAsteroide() {
     var tamanho = Math.floor(Math.random() * 100) + 50;
-    var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
+    var marginl = Math.floor(Math.random() * $(window).width()) + 0;
 
     //sorteando a animação
     var animacao = Math.floor(Math.random() * 2) + 0;
 
     //mudando efeito estrelas
-    snowStorm.randomizeWind();
+    if (animacao == 0) {
+        snowStorm.randomizeWind(-10,10);
+    } else {
+        snowStorm.randomizeWind(10,10);
+    }
 
     $('body').append($('<img/>').attr({
         src: 'images/asteroide.png',
-        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: ' + -100 + 'px;',
+        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: -10px;',
         class: 'estrela ' + animacoes[animacao]
     }));
 
     setTimeout(function() {
         $('.estrela:not(.explodiu):eq(0)').remove();
-    }, 2500);
+    }, 1500);
 }
 
 $(document).on("mousemove", function(evt) {
