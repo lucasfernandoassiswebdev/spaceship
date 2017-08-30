@@ -16,7 +16,11 @@ body {
 
 #nave {
     position: absolute;
+<<<<<<< HEAD
     z-index: 9999;
+=======
+    z-index: 0;
+>>>>>>> e3bb53bece7840c3f78a1145a5e52347352e7678
     width: 50px;
     height: 50px;
 }
