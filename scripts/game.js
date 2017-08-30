@@ -12,8 +12,8 @@ var vida = 1000,
     yBoss,
     tempoTiroBoss = 1000,
     lado = 'D',
-    valor = 14;
-
+    valor = 7.8,
+    nasceAsteroide = true;
 $(document).ready(function() {
     geraNave();
 
@@ -39,13 +39,10 @@ $(document).ready(function() {
 });
 
 function geraNave() {
-    $('#nave').append($('<img/>').attr({
-        src: 'images/nave2.png',
-        style: 'width:50px;height:50px;'
-    }));
+    $('#nave').append($('<img/>').attr("src", 'images/nave2.png'));
 }
 
-var intervalAsteroides = setInterval(geraAsteroide, tempo);
+var intervalAsteroides = nasceAsteroide ? setInterval(geraAsteroide, tempo) : undefined;
 var intervalTiros = setInterval(movimentaTiro, 25);
 
 function geraAsteroide() {
@@ -81,10 +78,10 @@ $(document).on("mousemove", function(evt) {
 
 $(document).bind('click', function() {
     if (lado == 'E') {
-        valor = -0;
+        valor = 3;
         lado = 'D';
     } else {
-        valor = 20;
+        valor = 13;
         lado = 'E';
     };
     atira();
@@ -93,11 +90,29 @@ $(document).bind('click', function() {
 function atira() {
     x = $('#nave')[0].getBoundingClientRect().left;
     y = $('#nave')[0].getBoundingClientRect().top;
-    $('body').append($('<img/>').attr({
-        src: 'images/bala.png',
-        style: 'left: ' + (x + valor) + 'px; top: ' + y + 'px; transform: rotate(' + graus + 'deg);',
-        class: 'bala'
-    }).attr("data-grau", graus));
+    $('body').append(
+        $('<img/>').attr('src', 'images/bala.png').addClass('bala').css({
+            position: 'absolute',
+            left: (x + valor + 7.8) + 'px',
+            top: y + 'px',
+            transform: 'rotate(' + graus + 'deg) translate(' + valor + 'px, ' + y + 'px)'
+        }).attr("data-grau", graus).attr("data-eixo-x", valor)
+    );
+}
+
+function movimentaTiro() {
+    $('.bala').each(function() {
+        var eixoy = (+$(this).attr("data-eixo-y") || 0) - 20;
+
+        if (eixoy < -2000) {
+            $(this).remove();
+        } else {
+            $(this)
+                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + $(this).attr('data-eixo-x') + 'px, ' + eixoy + 'px)')
+                .attr('data-eixo-y', eixoy);
+        }
+        
+    });
 }
 
 /* 
@@ -116,20 +131,6 @@ function movimentaTiro() {
     });
 }
 */
-
-function movimentaTiro() {
-    $('.bala').each(function() {
-        var eixoy = (+$(this).attr("data-eixo") || 0) - 20;
-
-        if (eixoy < -2000) {
-            $(this).remove();
-        } else {
-            $(this)
-                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + valor + 'px, ' + eixoy + 'px)')
-                .attr("data-eixo", eixoy);
-        }
-    });
-}
 
 window.onkeydown = function(e) {
     var key = e.keyCode ? e.keyCode : e.which;
@@ -160,7 +161,7 @@ setInterval(function() {
 
 function verificaBatida() {
     var nave = $("#nave");
-    var asteroides = $(".estrela");
+    var asteroides = $(".estrela:not(.explodiu)");
 
     var rangeIntersect = function(min0, max0, min1, max1) {
         return Math.max(min0, max0) >= Math.min(min1, max1) && Math.min(min0, max0) <= Math.max(min1, max1)
@@ -174,12 +175,12 @@ function verificaBatida() {
     asteroides.each(function() {
         var BBoxB = this.getBoundingClientRect();
         if (rectIntersect(BBoxA, BBoxB)) {
-            $('img:eq(0), .estrela').attr('src', 'images/explosao.gif-c200');
+            $('#nave img').attr('src', 'images/explosao.gif-c200');
 
             setTimeout(function() {
                 graus = 0;
 
-                $('img:eq(0), .estrela, .bala').remove();
+                $('#nave img, .estrela, .bala').remove();
                 $('#looseLabelA, #looseButton').show();
                 $("*").css("cursor", "default");
 
@@ -205,18 +206,22 @@ function verificaBatidaTiro() {
 
     $(".bala").each(function() {
         var BBoxA = this.getBoundingClientRect();
-        $(".estrela").each(function() {
+        $(".estrela:not(.explodiu)").each(function() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 excluir = true;
                 pontos++;
-                tempo--;
+                tempo -= 20;
 
                 if (pontos < 25) {
                     clearInterval(intervalAsteroides);
                     intervalAsteroides = setInterval(geraAsteroide, tempo);
 
-                    $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu");
+                    $(this).attr('src', 'images/explosao.gif-c200').addClass("explodiu").css({
+                        animation: "none",
+                        top: BBoxB.top + "px",
+                        left: BBoxB.left + "px"
+                    });
                     setTimeout(function() {
                         $('.explodiu').remove();
                     }, 600);
@@ -309,10 +314,10 @@ function batidaBoss() {
     asteroides.each(function() {
         var BBoxB = this.getBoundingClientRect();
         if (rectIntersect(BBoxA, BBoxB)) {
-            $('img:eq(0), .estrela, .boss').attr('src', 'images/explosao.gif-c200');
+            $('#nave img, .boss').attr('src', 'images/explosao.gif-c200');
             setTimeout(function() {
                 graus = 0;
-                $('img:eq(0), .estrela, .bala, .bossShoot').remove();
+                $('#nave img, .estrela, .bala, .bossShoot, .boss').remove();
                 limpaIntervals();
                 $('#looseLabelA, #looseButton').show();
                 $("*").css("cursor", "default");
