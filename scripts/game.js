@@ -4,6 +4,8 @@ var pontos = 0,
     pedras = 0;
 //variáveis de controle da nave
 var naveObj = {
+    x: 0,
+    y: 0,
     graus: 0,
     lado: 'D',
     speed: 3,
@@ -13,7 +15,7 @@ var naveObj = {
 var right,
     left;
 //variáveis de controle do boss
-var boss = {
+var bossObj = {
     vida: 1000,
     y: 0,
     tempoTiroBoss: 1000
@@ -96,28 +98,28 @@ $(document).bind('click', function() {
 });
 
 function atira() {
-    x = $('#nave')[0].getBoundingClientRect().left;
-    y = $('#nave')[0].getBoundingClientRect().top;
+    naveObj.x = $('#nave')[0].getBoundingClientRect().left;
+    naveObj.y = $('#nave')[0].getBoundingClientRect().top;
     $('body').append(
         $('<img/>').attr('src', 'images/bala.png').addClass('bala').css({
             position: 'absolute',
-            left: (x + naveObj.valor + 7.8) + 'px',
-            top: y + 'px',
-            transform: 'rotate(' + naveObj.graus + 'deg) translate(' + naveObj.valor + 'px, ' + y + 'px)'
+            left: (naveObj.x + naveObj.valor + 7.8) + 'px',
+            top: naveObj.y + 'px',
+            transform: 'rotate(' + naveObj.graus + 'deg) translate(' + naveObj.valor + 'px, ' + naveObj.y + 'px)'
         }).attr("data-grau", naveObj.graus).attr("data-eixo-x", naveObj.valor)
     );
 }
 
 function movimentaTiro() {
     $('.bala').each(function() {
-        var eixoy = (+$(this).attr("data-eixo-y") || 0) - 20;
+        var eixoYBala = (+$(this).attr("data-eixo-y") || 0) - 20;
 
-        if (eixoy < -2000) {
+        if (eixoYBala < -2000) {
             $(this).remove();
         } else {
             $(this)
-                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + $(this).attr('data-eixo-x') + 'px, ' + eixoy + 'px)')
-                .attr('data-eixo-y', eixoy);
+                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + $(this).attr('data-eixo-x') + 'px, ' + eixoYBala + 'px)')
+                .attr('data-eixo-y', eixoYBala);
         }
 
     });
@@ -250,7 +252,7 @@ function verificaBatidaTiro() {
 }
 
 intervalColisao = setInterval(verificaBatida, 10);
-intervalColisaoTiros = setInterval(verificaBatidaTiro, 10);
+intervalColisaoTiros = setInterval(verificaBatidaTiro, 5);
 intervalAsteroides = nasceAsteroide ? setInterval(geraAsteroide, tempo) : undefined;
 intervalTiros = setInterval(movimentaTiro, 25);
 
@@ -267,7 +269,7 @@ function nascerBoss() {
         class: 'boss'
     }));
 
-    intervalTirosBoss = setInterval(bossShoot, tempoTiroBoss);
+    intervalTirosBoss = setInterval(bossShoot, bossObj.tempoTiroBoss);
     intervalBalasBoss = setInterval(movimentaTiroBoss, 20);
     intervalBatida = setInterval(batidaBoss, 20);
     intervalNaveBoss = setInterval(verificaTiroNaveBoss, 20)
@@ -275,10 +277,10 @@ function nascerBoss() {
 
     //aumenta a velocidade dos tiros do boss
     intervalAumentaDificuldade = setInterval(function() {
-        if (tempoTiroBoss >= 101) {
+        if (bossObj.tempoTiroBoss >= 101) {
             clearInterval(intervalTirosBoss);
-            tempoTiroBoss -= 75;
-            intervalTirosBoss = setInterval(bossShoot, tempoTiroBoss);
+            bossObj.tempoTiroBoss -= 75;
+            intervalTirosBoss = setInterval(bossShoot, bossObj.tempoTiroBoss);
         }
     }, 4000);
 
