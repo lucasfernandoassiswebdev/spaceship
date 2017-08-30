@@ -52,7 +52,7 @@ function geraNave() {
 
 function geraAsteroide() {
     var tamanho = Math.floor(Math.random() * 91) + 20;
-    var marginl = Math.floor(Math.random() * $(window).width()) + 0;
+    var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 200;
 
     //sorteando a animação
     var animacao = Math.floor(Math.random() * 2) + 0;
@@ -222,18 +222,20 @@ function verificaBatidaTiro() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 excluir = true;
-                tempo -= 20;
 
                 //verificando o tamanho do asteróide para dar os pontos
-                if ($(this).attr('width') >= 20 && $(this).attr('width') <= 30) {
+                if ($(this).width() >= 1 && $(this).width() <= 20) {
+                    pontos += 20;
+                } else if ($(this).width() > 20 && $(this).width() <= 60) {
+                    pontos += 15;
+                } else if ($(this).width() > 60 && $(this).width() <= 90) {
                     pontos += 10;
-                } else if ($(this).attr('width') > 30 && $(this).attr('width') <= 50) {
-                    pontos += 5;
-                } else {
+                } else if ($(this).width() > 90) {
                     pontos++;
                 }
 
-                if (pontos <= 120) {
+                if (pontos <= 50) {
+                    tempo -= 20;
                     clearInterval(intervalAsteroides);
                     intervalAsteroides = setInterval(geraAsteroide, tempo);
 
@@ -299,10 +301,12 @@ function nascerBoss() {
 
             $('#pontos').html('Boss vida: ' + bossObj.vida);
             $('.vida').addClass('efeitoGanho');
+            $('.statusVidaBoss').text('Regenerando +++');
 
             setTimeout(function() {
-                $('.vida').removeClass('efeitoGanhoVida');
-            }, 400);
+                $('.vida').removeClass('efeitoGanho');
+                $('.statusVidaBoss').text('');
+            }, 500);
         }
     }, 4500);
 }
