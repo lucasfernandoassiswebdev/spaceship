@@ -28,7 +28,6 @@ body {
 
 .estrela {
     position: absolute;
-    animation: orbita 2s linear infinite;
 }
 
 .bala {
@@ -114,6 +113,24 @@ button {
     }
     to {
         transform: rotate(360deg) translateX(150px) rotate(-360deg);
+    }
+}
+
+@keyframes desceD {
+    from {
+        transform: translate(0px, 0px);
+    }
+    to {
+        transform: translate(800px, 638px);
+    }
+}
+
+@keyframes desceE {
+    from {
+        transform: translate(0px, 0px);
+    }
+    to {
+        transform: translate(-800px, 638px);
     }
 }
 

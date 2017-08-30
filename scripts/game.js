@@ -4,8 +4,6 @@ var pontos = 0,
     pedras = 0;
 //variáveis de controle da nave
 var naveObj = {
-    x: 0,
-    y: 0,
     graus: 0,
     lado: 'D',
     velocidade: 3,
@@ -21,6 +19,7 @@ var bossObj = {
     tempoTiroBoss: 1000
 }
 var nasceAsteroide = true;
+var animacoes = ['desceD', 'desceE'];
 
 $(document).ready(function() {
     geraNave();
@@ -52,24 +51,17 @@ function geraNave() {
 }
 
 function geraAsteroide() {
-    naveObj.y = $('#nave').position().top;
-    naveObj.x = $('#nave').position().left;
-
     var tamanho = Math.floor(Math.random() * 100) + 50;
     var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
-    var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
 
-    //verificando se o asteróide não nasceu muito próximo a nave
-    while (marginl >= (naveObj.x - 300) && marginl <= (naveObj.x + 200) && margint >= (naveObj.y - 300) && margint <= (naveObj.y + 300)) {
-        var marginl = Math.floor(Math.random() * ($(window).width() - 200)) + 80;
-        var margint = Math.floor(Math.random() * ($(window).height() - 200)) + 80;
-    }
+    //sorteando animação asteróide
+    var animacao = Math.floor(Math.random() * 2) + 0;
 
     $('body').append($('<img/>').attr({
         src: 'images/asteroide.png',
-        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: ' + margint + 'px;',
+        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: ' + -50 + 'px;',
         class: 'estrela'
-    }));
+    }).css('animation', animacoes[animacao] + ' 1.5s linear'));
 
     pedras = $('.estrela').length;
 
@@ -80,6 +72,10 @@ function geraAsteroide() {
             intervalAsteroides = setInterval(geraAsteroide, tempo);
         }, 4000);
     }
+
+    setTimeout(function() {
+        $('.estrela:not(.explodiu):eq(0)').remove();
+    }, 4000);
 }
 
 $(document).on("mousemove", function(evt) {
@@ -114,7 +110,7 @@ function atira() {
 
 function movimentaTiro() {
     $('.bala').each(function() {
-        var eixoYBala = (+$(this).attr("data-eixo-y") || 0) - 20;
+        var eixoYBala = (+$(this).attr("data-eixo-y") || 0) - 30;
 
         if (eixoYBala < -2000) {
             $(this).remove();
