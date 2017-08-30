@@ -121,7 +121,6 @@ function movimentaTiro() {
                 .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + $(this).attr('data-eixo-x') + 'px, ' + eixoYBala + 'px)')
                 .attr('data-eixo-y', eixoYBala);
         }
-
     });
 }
 
