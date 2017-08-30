@@ -3,17 +3,21 @@ var pontos = 0,
     tempo = 2000,
     pedras = 0;
 //variáveis de controle da nave
-var graus = 0,
-    lado = 'D',
-    right,
-    left,
-    speed = 3,
-    valor = 14;
+var naveObj = {
+    graus: 0,
+    lado: 'D',
+    speed: 3,
+    valor: 14
+};
+//variáveis de controle de rotação da nave
+var right,
+    left;
 //variáveis de controle do boss
-var vida = 1000,
-    yBoss,
-    tempoTiroBoss = 1000;
-
+var boss = {
+    vida: 1000,
+    y: 0,
+    tempoTiroBoss: 1000
+}
 var nasceAsteroide = true;
 
 $(document).ready(function() {
@@ -22,7 +26,7 @@ $(document).ready(function() {
     $('#looseLabelA, #looseButton, .vida').hide();
 
     $('#looseButton').on('click', function() {
-        vida = 1000;
+        boss.vida = 1000;
         tempo = 2000;
         pontos = 0;
         tempoTiroBoss = 1000;
@@ -81,12 +85,12 @@ $(document).on("mousemove", function(evt) {
 
 $(document).bind('click', function() {
     //código que faz os tiros sairem alternadamente da nave
-    if (lado == 'E') {
-        valor = 1;
-        lado = 'D';
+    if (naveObj.lado == 'E') {
+        naveObj.valor = 1;
+        naveObj.lado = 'D';
     } else {
-        valor = 8;
-        lado = 'E';
+        naveObj.valor = 8;
+        naveObj.lado = 'E';
     };
     atira();
 });
@@ -97,10 +101,10 @@ function atira() {
     $('body').append(
         $('<img/>').attr('src', 'images/bala.png').addClass('bala').css({
             position: 'absolute',
-            left: (x + valor + 7.8) + 'px',
+            left: (x + naveObj.valor + 7.8) + 'px',
             top: y + 'px',
-            transform: 'rotate(' + graus + 'deg) translate(' + valor + 'px, ' + y + 'px)'
-        }).attr("data-grau", graus).attr("data-eixo-x", valor)
+            transform: 'rotate(' + naveObj.graus + 'deg) translate(' + naveObj.valor + 'px, ' + y + 'px)'
+        }).attr("data-grau", naveObj.graus).attr("data-eixo-x", naveObj.valor)
     );
 }
 
@@ -155,11 +159,11 @@ setInterval(function() {
     if (!left && !right)
         return;
     if (left)
-        graus -= speed;
+        naveObj.graus -= naveObj.speed;
     if (right)
-        graus += speed;
+        naveObj.graus += naveObj.speed;
 
-    $('#nave').css('transform', 'rotate(' + graus + 'deg)');
+    $('#nave').css('transform', 'rotate(' + naveObj.graus + 'deg)');
 }, 10);
 
 function verificaBatida() {
@@ -182,7 +186,7 @@ function verificaBatida() {
             $('#nave img').attr('src', 'images/explosao.gif-c200');
 
             setTimeout(function() {
-                graus = 0;
+                naveObj.graus = 0;
 
                 $('#nave img, .estrela, .bala').remove();
                 $('#looseLabelA, #looseButton').show();
@@ -280,18 +284,18 @@ function nascerBoss() {
 
     //regenera a vida do boss 
     intervalRegen = setInterval(function() {
-        if (vida <= 950) {
-            vida += 50;
+        if (boss.vida <= 950) {
+            boss.vida += 50;
         }
     }, 4500);
 }
 
 function bossShoot() {
-    yBoss = $('.boss').position().top;
+    boss.y = $('.boss').position().top;
 
     $('body').append($('<img/>').attr({
         src: 'images/balaBoss.png',
-        style: 'position:absolute; left: 160px; top: ' + (yBoss + 62.5) + 'px; width: 20px; height: 20px',
+        style: 'position:absolute; left: 160px; top: ' + (boss.y + 62.5) + 'px; width: 20px; height: 20px',
         class: 'bossShoot',
     }).attr("data-left", 160));
 }
@@ -326,7 +330,7 @@ function batidaBoss() {
         if (rectIntersect(BBoxA, BBoxB)) {
             $('#nave img, .boss').attr('src', 'images/explosao.gif-c200');
             setTimeout(function() {
-                graus = 0;
+                naveObj.graus = 0;
 
                 $('#nave img, .bala, .bossShoot, .boss').remove();
                 $('#looseLabelA, #looseButton').show();
@@ -357,17 +361,17 @@ function verificaTiroNaveBoss() {
 
             if (rectIntersect(BBoxA, BBoxB)) {
                 excluir = true;
-                vida -= 7;
-                var porcentagem = (vida * 100) / 1000;
+                boss.vida -= 7;
+                var porcentagem = (boss.vida * 100) / 1000;
 
                 $('.vida').addClass('efeitoPerca').css('width', porcentagem + '%');
-                $('#pontos').html('Boss vida: ' + vida);
+                $('#pontos').html('Boss vida: ' + boss.vida);
 
                 setTimeout(function() {
                     $('.vida').removeClass('efeitoPerca');
                 }, 300);
 
-                if (vida <= 0) {
+                if (boss.vida <= 0) {
                     limpaIntervals();
 
                     $('#pontos').html('Você destruiu o boss <br/> Você venceu');
@@ -410,7 +414,7 @@ function verificaTiroBossNave() {
             setTimeout(function() {
                 limpaIntervals();
 
-                graus = 0;
+                naveObj.graus = 0;
 
                 $('img').remove();
                 $('#looseButton').show();
