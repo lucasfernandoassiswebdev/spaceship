@@ -1,6 +1,9 @@
 //variáveis de controle de jogo
 var pontos = 0,
-    tempo = 2000;
+    tempo = 2000,
+    nasceAsteroide = true,
+    animacoes = ['desceEsquerda', 'desceDireita'],
+    imgAsteroide = ['meteoro1.gif', 'meteoro2.gif'];
 //variáveis de controle da nave
 var naveObj = {
     graus: 0,
@@ -17,8 +20,6 @@ var bossObj = {
     y: 0,
     tempoTiroBoss: 1000
 }
-var nasceAsteroide = true;
-var animacoes = ['desceEsquerda', 'desceDireita'];
 
 $(document).ready(function() {
     geraNave();
@@ -46,26 +47,32 @@ $(document).ready(function() {
 });
 
 function geraNave() {
-    $('#nave').append($('<img/>').attr("src", 'images/nave2.png'));
+    $('#nave').append($('<img/>').attr("src", 'images/naves/nave2.png'));
 }
 
 function geraAsteroide() {
-    var tamanho = Math.floor(Math.random() * 100) + 50;
+    var tamanho = Math.floor(Math.random() * 91) + 20;
     var marginl = Math.floor(Math.random() * $(window).width()) + 0;
 
     //sorteando a animação
     var animacao = Math.floor(Math.random() * 2) + 0;
 
-    //mudando efeito estrelas
+    //sorteando o asteróide
+    var sorteado = Math.floor(Math.random() * imgAsteroide.length) + 0;
+
+    //sorteando o angulo do asteróide
+    var anguloSorteado = Math.floor(Math.random() * 361) + 0;
+
+    //mudando efeito estrelas de acordo com a direção em que o asteróide vem
     if (animacao == 0) {
-        snowStorm.randomizeWind(-10,10);
+        snowStorm.randomizeWind(-10, 10);
     } else {
-        snowStorm.randomizeWind(10,10);
+        snowStorm.randomizeWind(10, 10);
     }
 
     $('body').append($('<img/>').attr({
-        src: 'images/asteroide.png',
-        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: -10px;',
+        src: 'images/meteoros/' + imgAsteroide[sorteado],
+        style: 'width: ' + tamanho + 'px; height: ' + tamanho + 'px; left: ' + marginl + 'px; top: -10px; transform: rotate(' + anguloSorteado + 'deg)',
         class: 'estrela ' + animacoes[animacao]
     }));
 
@@ -95,7 +102,7 @@ function atira() {
     naveObj.x = $('#nave')[0].getBoundingClientRect().left;
     naveObj.y = $('#nave')[0].getBoundingClientRect().top;
     $('body').append(
-        $('<img/>').attr('src', 'images/bala.png').addClass('bala').css({
+        $('<img/>').attr('src', 'images/balas/bala.png').addClass('bala').css({
             position: 'absolute',
             left: (naveObj.x + naveObj.valor + 7.8) + 'px',
             top: naveObj.y + 'px',
@@ -215,10 +222,18 @@ function verificaBatidaTiro() {
             var BBoxB = this.getBoundingClientRect();
             if (rectIntersect(BBoxA, BBoxB)) {
                 excluir = true;
-                pontos++;
                 tempo -= 20;
 
-                if (pontos < 5) {
+                //verificando o tamanho do asteróide para dar os pontos
+                if ($(this).attr('width') >= 20 && $(this).attr('width') <= 30) {
+                    pontos += 10;
+                } else if ($(this).attr('width') > 30 && $(this).attr('width') <= 50) {
+                    pontos += 5;
+                } else {
+                    pontos++;
+                }
+
+                if (pontos <= 120) {
                     clearInterval(intervalAsteroides);
                     intervalAsteroides = setInterval(geraAsteroide, tempo);
 
@@ -257,7 +272,7 @@ function nascerBoss() {
     $('#pontos').html('Boss');
     $('.vida').show();
     $('#boss').append($('<img/>').attr({
-        src: 'images/inimigo.png',
+        src: 'images/naves/inimigo.png',
         style: 'width:150px;height:150px;transform:rotate(90deg)',
         class: 'boss'
     }));
@@ -296,7 +311,7 @@ function bossShoot() {
     bossObj.y = $('.boss').position().top;
 
     $('body').append($('<img/>').attr({
-        src: 'images/balaBoss.png',
+        src: 'images/balas/balaBoss.png',
         style: 'position:absolute; left: 160px; top: ' + (bossObj.y + 62.5) + 'px; width: 20px; height: 20px',
         class: 'bossShoot',
     }).attr("data-esquerda", 160));
