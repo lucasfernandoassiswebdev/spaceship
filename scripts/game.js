@@ -7,9 +7,9 @@ var pontos = 0,
 //variáveis de controle da nave
 var naveObj = {
     graus: 0,
-    lado: 'D',
+    lado: 'E',
     velocidade: 3,
-    valor: 14
+    valor: 0
 };
 //variáveis de controle de rotação da nave
 var direita,
@@ -89,10 +89,10 @@ $(document).on("mousemove", function(evt) {
 $(document).bind('click', function() {
     //código que faz os tiros sairem alternadamente da nave
     if (naveObj.lado == 'E') {
-        naveObj.valor = 1;
+        naveObj.valor = 8;
         naveObj.lado = 'D';
     } else {
-        naveObj.valor = 8;
+        naveObj.valor = 20;
         naveObj.lado = 'E';
     };
     atira();
@@ -101,13 +101,17 @@ $(document).bind('click', function() {
 function atira() {
     naveObj.x = $('#nave')[0].getBoundingClientRect().left;
     naveObj.y = $('#nave')[0].getBoundingClientRect().top;
+
     $('body').append(
         $('<img/>').attr('src', 'images/balas/bala.png').addClass('bala').css({
             position: 'absolute',
-            left: (naveObj.x + naveObj.valor + 7.8) + 'px',
-            top: naveObj.y + 'px',
-            transform: 'rotate(' + naveObj.graus + 'deg) translate(' + naveObj.valor + 'px, ' + naveObj.y + 'px)'
-        }).attr("data-grau", naveObj.graus).attr("data-eixo-x", naveObj.valor)
+            left: (naveObj.x + naveObj.valor) + 'px',
+            top: (naveObj.y - 20) + 'px',
+            transform: 'rotate(' + naveObj.graus + 'deg)'
+        }).attr({
+            "data-grau": naveObj.graus,
+            "data-eixo-x": naveObj.valor + naveObj.x
+        })
     );
 }
 
@@ -119,7 +123,7 @@ function movimentaTiro() {
             $(this).remove();
         } else {
             $(this)
-                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(' + $(this).attr('data-eixo-x') + 'px, ' + eixoYBala + 'px)')
+                .css('transform', 'rotate(' + $(this).attr("data-grau") + 'deg) translate(0px, ' + eixoYBala + 'px)')
                 .attr('data-eixo-y', eixoYBala);
         }
     });
